@@ -2,15 +2,11 @@
 import React, { useContext, useRef, useEffect } from 'react';
 import { StateContext, DispatchContext } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatUnits } from 'quais';
 import { Button } from '@/components/ui/button';
-import { Coins, TrendingUp, Clock, ExternalLink, ArrowRight, Gift, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Coins, TrendingUp, ExternalLink, ArrowRight, Gift, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useStaking } from '@/lib/hooks/useStaking';
-import useLPStaking from '@/lib/hooks/useLPStaking';
-import { LP_POOLS } from '@/lib/config';
 import { formatBalance } from '@/lib/utils/formatBalance';
 import { requestAccounts } from '@/lib/wallet';
 
@@ -203,99 +199,23 @@ const ConnectWalletButton = () => {
 };
 
 // Token Logo Component
-const TokenLogos = ({ tokens, size = 24 }: { tokens: string[], size?: number }) => {
-  const getTokenLogo = (token: string) => {
-    switch (token.toLowerCase()) {
-      case 'quai':
-        return '/images/quai-logo.png';
-      case 'wqi':
-      case 'qi':
-        return '/images/qi-logo.png';
-      case 'usdc':
-        return '/images/usdc-logo.png';
-      default:
-        return '/images/quai-logo.png';
-    }
-  };
-
-  if (tokens.length === 1) {
-    return (
-      <div className="flex items-center">
-        <Image
-          src={getTokenLogo(tokens[0])}
-          alt={tokens[0]}
-          width={size}
-          height={size}
-          className="rounded-full"
-        />
-      </div>
-    );
-  }
-
+const TokenLogo = ({ size = 24 }: { size?: number }) => {
   return (
     <div className="flex items-center">
       <Image
-        src={getTokenLogo(tokens[0])}
-        alt={tokens[0]}
+        src="/images/quai-logo.png"
+        alt="QUAI"
         width={size}
         height={size}
-        className="rounded-full border-2 border-[#1a1a1a] z-10"
-      />
-      <Image
-        src={getTokenLogo(tokens[1])}
-        alt={tokens[1]}
-        width={size}
-        height={size}
-        className="rounded-full border-2 border-[#1a1a1a] -ml-2"
+        className="rounded-full"
       />
     </div>
   );
 };
 
-// Mock user staking data - set to 0 for LP pools until implemented
-const userStakingData = {
-  'native-quai': {
-    name: 'QUAI',
-    tokens: ['QUAI'],
-    staked: 0, // Will use real data from contract
-    earned: 0,
-    lockPeriod: null,
-    endDate: null,
-    apr: 0
-  },
-  'quai-usdc': {
-    name: 'QUAI/USDC LP',
-    tokens: ['QUAI', 'USDC'],
-    staked: 0,
-    earned: 0,
-    lockPeriod: null,
-    endDate: null,
-    apr: 0
-  },
-  'wqi-quai': {
-    name: 'WQI/QUAI LP',
-    tokens: ['WQI', 'QUAI'],
-    staked: 0,
-    earned: 0,
-    lockPeriod: null,
-    endDate: null,
-    apr: 0
-  },
-  'wqi-usdc': {
-    name: 'WQI/USDC LP',
-    tokens: ['WQI', 'USDC'],
-    staked: 0,
-    earned: 0,
-    lockPeriod: null,
-    endDate: null,
-    apr: 0
-  }
-};
-
 export default function Portfolio() {
   const { account } = useContext(StateContext);
   const staking = useStaking();
-  const wqiQuaiLPStaking = useLPStaking('wqi-quai');
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -304,14 +224,6 @@ export default function Portfolio() {
       return `${(num / 1000).toFixed(0)}K`;
     }
     return num.toLocaleString();
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
   };
 
   const formatTimeLeft = (seconds: number) => {
@@ -324,106 +236,12 @@ export default function Portfolio() {
     return `${m}m`;
   };
 
-  // Calculate totals - use real data for native QUAI, mock for others
+  // Get real staking data
   const realQuaiStaked = staking.userInfo ? Number(staking.userInfo.stakedAmountFormatted) : 0;
   const realQuaiClaimable = staking.userInfo ? Number(staking.userInfo.claimableRewardsFormatted) : 0;
-  const realQuaiDelayed = staking.userInfo ? Number(staking.userInfo.totalDelayedRewardsFormatted) : 0;
-  const realQuaiPending = staking.userInfo ? Number(staking.userInfo.pendingRewardsFormatted) : 0;
-  // Earned reflects claimable (unlocked) + delayed (locked) rewards; excludes pending
-  const realQuaiTotalEarned = realQuaiClaimable + realQuaiDelayed;
   const realQuaiApr = staking.contractInfo ? staking.contractInfo.apy : 0;
 
-  // Only include positions that actually have staked amounts
-  const allPositions = [];
-
-  // Add real QUAI position only if user has staked amount
-  if (realQuaiStaked > 0) {
-    allPositions.push({
-      id: 'native-quai',
-      name: 'QUAI',
-      tokens: ['QUAI'],
-      staked: realQuaiStaked,
-      earned: realQuaiTotalEarned, // Total earned (all rewards)
-      claimableRewards: realQuaiClaimable,
-      totalDelayedRewards: realQuaiDelayed,
-      pendingRewards: realQuaiPending,
-      apr: realQuaiApr,
-      lockPeriod: staking.userInfo?.isLocked ? 30 : null,
-      endDate: staking.userInfo?.lockEndTime ? new Date(staking.userInfo.lockEndTime * 1000).toISOString().split('T')[0] : null,
-      isReal: true,
-      userStatus: staking.userInfo?.userStatus || 'Unknown',
-      isInExitPeriod: staking.userInfo?.isInExitPeriod || false,
-      canExecuteWithdraw: staking.userInfo?.canExecuteWithdraw || false,
-      timeUntilWithdrawalAvailable: staking.userInfo?.timeUntilWithdrawalAvailable || 0
-    });
-  }
-
-  // Add real WQI/QUAI LP position if user has staked amount (avoid 3-decimal rounding losses)
-  const realLPStaked = wqiQuaiLPStaking.poolInfo?.stakingInfo
-    ? Number(formatUnits(wqiQuaiLPStaking.poolInfo.stakingInfo.stakedAmount || BigInt(0), 18))
-    : 0;
-  const lpClaimable = wqiQuaiLPStaking.poolInfo?.stakingInfo
-    ? Number(formatUnits(wqiQuaiLPStaking.poolInfo.stakingInfo.claimableRewards || BigInt(0), 18))
-    : 0;
-  const lpDelayedTotal = wqiQuaiLPStaking.poolInfo?.stakingInfo
-    ? Number(formatUnits(wqiQuaiLPStaking.poolInfo.stakingInfo.totalDelayedRewards || BigInt(0), 18))
-    : 0;
-  const lpPending = wqiQuaiLPStaking.poolInfo?.stakingInfo
-    ? Number(formatUnits(wqiQuaiLPStaking.poolInfo.stakingInfo.pendingRewards || BigInt(0), 18))
-    : 0;
-  // LP earned reflects claimable + delayed; excludes pending
-  const realLPEarned = lpClaimable + lpDelayedTotal;
-  const realLPApr = wqiQuaiLPStaking.poolInfo?.poolMetrics?.apr || 0;
-
-  if (realLPStaked > 0 && LP_POOLS['wqi-quai']?.isActive) {
-    allPositions.push({
-      id: 'wqi-quai',
-      name: 'WQI/QUAI LP',
-      tokens: ['WQI', 'QUAI'],
-      staked: realLPStaked,
-      earned: realLPEarned,
-      claimableRewards: lpClaimable,
-      totalDelayedRewards: lpDelayedTotal,
-      pendingRewards: lpPending,
-      apr: realLPApr,
-      lockPeriod: wqiQuaiLPStaking.poolInfo?.stakingInfo?.isLocked ? 0 : null,
-      endDate: (() => {
-        const t = wqiQuaiLPStaking.poolInfo?.stakingInfo?.timeUntilUnlock || 0;
-        return t > 0 ? new Date(Date.now() + t * 1000).toISOString().split('T')[0] : null;
-      })(),
-      isReal: true,
-      userStatus: wqiQuaiLPStaking.poolInfo?.stakingInfo?.userStatus || 'Unknown',
-      isInExitPeriod: wqiQuaiLPStaking.poolInfo?.stakingInfo?.isInExitPeriod || false,
-      canExecuteWithdraw: wqiQuaiLPStaking.poolInfo?.stakingInfo?.canExecuteWithdraw || false,
-      timeUntilWithdrawalAvailable: wqiQuaiLPStaking.poolInfo?.stakingInfo?.timeUntilWithdrawalAvailable || 0,
-      timeUntilUnlock: wqiQuaiLPStaking.poolInfo?.stakingInfo?.timeUntilUnlock || 0
-    });
-  }
-
-  // Add mock LP positions for other pools (only if they have staked amounts)
-  Object.entries(userStakingData).filter(([id]) => id !== 'native-quai' && id !== 'wqi-quai').forEach(([id, data]) => {
-    if (data.staked > 0) {
-      allPositions.push({
-        id,
-        ...data,
-        name: id === 'quai-usdc' ? 'QUAI/USDC LP' : 'WQI/USDC LP',
-        tokens: id === 'quai-usdc' ? ['QUAI', 'USDC'] : ['WQI', 'USDC'],
-        isReal: false
-      });
-    }
-  });
-
-  const totalStaked = allPositions.reduce((sum, pos) => sum + pos.staked, 0);
-  const totalStakedQuai = realQuaiStaked;
-  const totalStakedLP = allPositions.filter(pos => pos.id !== 'native-quai').reduce((sum, pos) => sum + pos.staked, 0);
-  const totalEarned = allPositions.reduce((sum, pos) => sum + pos.earned, 0);
-  const activePositions = allPositions.filter(pos => pos.staked > 0);
-  const totalClaimable = activePositions.reduce((sum, pos) => sum + (pos.claimableRewards ?? 0), 0);
-
-  // Calculate weighted APR
-  const weightedApr = activePositions.length > 0
-    ? activePositions.reduce((sum, pos) => sum + (pos.apr * pos.staked), 0) / totalStaked
-    : 0;
+  const hasPosition = realQuaiStaked > 0;
 
   if (!account?.addr) {
     return (
@@ -465,7 +283,7 @@ export default function Portfolio() {
     );
   }
 
-  if (activePositions.length === 0) {
+  if (!hasPosition) {
     return (
       <main className="flex min-h-screen flex-col items-center pt-32 pb-8 px-4">
         <div className="w-full max-w-4xl mx-auto">
@@ -495,41 +313,36 @@ export default function Portfolio() {
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-white">Your Portfolio</h1>
 
-        {/* Portfolio Overview - single row, ensure no overflow */}
+        {/* Portfolio Overview */}
         <Card className="modern-card">
           <CardContent className="p-4 overflow-hidden">
             <div className="flex flex-nowrap items-stretch justify-between gap-1 sm:gap-3 w-full">
               <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-white truncate">{formatNumber(totalStakedQuai)}</div>
+                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-white truncate">{formatNumber(realQuaiStaked)}</div>
                 <div className="text-[10px] sm:text-xs text-[#999999] truncate">Total Staked</div>
                 <div className="text-[10px] sm:text-xs text-[#666666] truncate">QUAI</div>
               </div>
               <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-white truncate">{formatNumber(totalStakedLP)}</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Total Staked</div>
-                <div className="text-[10px] sm:text-xs text-[#666666] truncate">LP Tokens</div>
-              </div>
-              <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-orange-400 truncate">{formatNumber(Number(formatBalance(totalEarned)))}</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Total Earned</div>
+                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-orange-400 truncate">{formatNumber(Number(formatBalance(realQuaiClaimable)))}</div>
+                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Claimable</div>
                 <div className="text-[10px] sm:text-xs text-[#666666] truncate">QUAI</div>
               </div>
               <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-red-400 truncate">{weightedApr.toLocaleString('en-US', { maximumFractionDigits: 1 })}%</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Weighted APR</div>
-                <div className="text-[10px] sm:text-xs text-[#666666] truncate">Average</div>
+                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-red-400 truncate">{realQuaiApr.toLocaleString('en-US', { maximumFractionDigits: 1 })}%</div>
+                <div className="text-[10px] sm:text-xs text-[#999999] truncate">APR</div>
+                <div className="text-[10px] sm:text-xs text-[#666666] truncate">Current</div>
               </div>
               <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-orange-500 truncate">{activePositions.length}</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Active Positions</div>
-                <div className="text-[10px] sm:text-xs text-[#666666] truncate">Pools</div>
+                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-orange-500 truncate">1</div>
+                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Active Position</div>
+                <div className="text-[10px] sm:text-xs text-[#666666] truncate">Pool</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Claimable Rewards - Display only */}
-        {totalClaimable > 0 && (
+        {/* Claimable Rewards */}
+        {realQuaiClaimable > 0 && (
           <Card className="modern-card bg-gradient-to-r from-red-900/20 to-orange-800/10 border-red-700/30">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
@@ -538,160 +351,117 @@ export default function Portfolio() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-white">Available Rewards</h3>
-                  <p className="text-2xl font-bold text-orange-400">{formatBalance(totalClaimable)} QUAI</p>
-                  <p className="text-xs text-[#999999]">Claim rewards from individual positions below</p>
+                  <p className="text-2xl font-bold text-orange-400">{formatBalance(realQuaiClaimable)} QUAI</p>
+                  <p className="text-xs text-[#999999]">Claim rewards from your position below</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* Active Positions - Cleaner layout */}
+        {/* Active Position */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-white">Active Positions</h2>
+          <h2 className="text-xl font-semibold text-white">Active Position</h2>
 
-          <div className="space-y-4">
-            {activePositions.map((position, index) => {
-              const nowSec = Math.floor(Date.now() / 1000);
-              const endTs = position.endDate ? Math.floor(new Date(position.endDate).getTime() / 1000) : 0;
-              const secondsLeft = endTs > nowSec ? (endTs - nowSec) : (position.timeUntilUnlock ?? 0) || 0;
-
-              return (
-                <Card key={index} className="modern-card">
-                  <CardContent className="p-6">
-                    {/* Header Row */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <TokenLogos tokens={position.tokens} size={32} />
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">{position.name}</h3>
-                          <div className="flex items-center gap-2">
-                            <span className="text-orange-400 text-sm font-medium">
-                              {position.apr >= 1000
-                                ? `${Math.round(position.apr).toLocaleString('en-US')}%`
-                                : `${position.apr.toLocaleString('en-US', { maximumFractionDigits: 1 })}%`} APR
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        {position.earned > 0 && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
-                            onClick={() => {
-                              if (position.id === 'native-quai' && position.isReal) {
-                                staking.claimRewards();
-                              } else if (position.id === 'wqi-quai' && position.isReal) {
-                                wqiQuaiLPStaking.claimLPRewards();
-                              } else {
-                                // Mock claim for other LP tokens
-                                console.log(`Claiming ${position.earned.toFixed(2)} rewards from ${position.name}`);
-                              }
-                            }}
-                            disabled={(position.id === 'native-quai' && staking.isTransacting) ||
-                              (position.id === 'wqi-quai' && wqiQuaiLPStaking.isTransacting)}
-                          >
-                            {(position.id === 'native-quai' && staking.isTransacting) ||
-                              (position.id === 'wqi-quai' && wqiQuaiLPStaking.isTransacting) ?
-                              'Claiming...' :
-                              `Claim`}
-                          </Button>
-                        )}
-                        {/* Withdrawal Actions for Native QUAI */}
-                        {position.id === 'native-quai' && position.isReal && position.isInExitPeriod && (
-                          position.canExecuteWithdraw ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-green-500 text-green-400 hover:bg-green-500 hover:text-white"
-                              onClick={() => staking.executeWithdraw()}
-                              disabled={staking.isTransacting}
-                            >
-                              {staking.isTransacting ? 'Processing...' : 'Complete'}
-                            </Button>
-                          ) : (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
-                              onClick={() => staking.cancelWithdraw()}
-                              disabled={staking.isTransacting}
-                            >
-                              Cancel
-                            </Button>
-                          )
-                        )}
-
-                        <Link href={`/stake/${position.id}?mode=manage`}>
-                          <Button size="sm" variant="outline" className="border-[#333333] text-[#999999] hover:bg-[#222222]">
-                            Manage
-                            <ArrowRight className="h-3 w-3 ml-1" />
-                          </Button>
-                        </Link>
-                      </div>
+          <Card className="modern-card">
+            <CardContent className="p-6">
+              {/* Header Row */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <TokenLogo size={32} />
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">QUAI</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-orange-400 text-sm font-medium">
+                        {realQuaiApr >= 1000
+                          ? `${Math.round(realQuaiApr).toLocaleString('en-US')}%`
+                          : `${realQuaiApr.toLocaleString('en-US', { maximumFractionDigits: 1 })}%`} APR
+                      </span>
                     </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {realQuaiClaimable > 0 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
+                      onClick={() => staking.claimRewards()}
+                      disabled={staking.isTransacting}
+                    >
+                      {staking.isTransacting ? 'Claiming...' : 'Claim'}
+                    </Button>
+                  )}
+                  {/* Withdrawal Actions */}
+                  {staking.userInfo?.isInExitPeriod && (
+                    staking.userInfo?.canExecuteWithdraw ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-green-500 text-green-400 hover:bg-green-500 hover:text-white"
+                        onClick={() => staking.executeWithdraw()}
+                        disabled={staking.isTransacting}
+                      >
+                        {staking.isTransacting ? 'Processing...' : 'Complete'}
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
+                        onClick={() => staking.cancelWithdraw()}
+                        disabled={staking.isTransacting}
+                      >
+                        Cancel
+                      </Button>
+                    )
+                  )}
 
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                      <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
-                        <div className="text-lg font-bold text-white">{formatNumber(position.staked)}</div>
-                        <div className="text-xs text-[#999999]">
-                          Staked {position.tokens.length > 1 ? 'LP' : position.tokens[0]}
-                        </div>
-                        <div className="text-xs text-white mt-1">
-                          ~${(position.staked * 0.05).toLocaleString()}
-                        </div>
-                      </div>
+                  <Link href="/stake/native-quai?mode=manage">
+                    <Button size="sm" variant="outline" className="border-[#333333] text-[#999999] hover:bg-[#222222]">
+                      Manage
+                      <ArrowRight className="h-3 w-3 ml-1" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
 
-                      <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
-                        <div className="text-lg font-bold text-white">{formatBalance(position.earned)}</div>
-                        <div className="text-xs text-[#999999]">
-                          Total Earned {position.id === 'wqi-quai' ? 'QUAI' : position.tokens[0]}
-                        </div>
-                        <div className="text-xs text-white mt-1">
-                          ~${(position.earned * 0.05).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                      </div>
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
+                  <div className="text-lg font-bold text-white">{formatNumber(realQuaiStaked)}</div>
+                  <div className="text-xs text-[#999999]">Staked QUAI</div>
+                </div>
 
-                      <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
-                        <div className="text-lg font-bold text-white">{formatBalance(position.claimableRewards)}</div>
-                        <div className="text-xs text-[#999999]">
-                          Claimable Now
-                        </div>
-                        <div className="text-xs text-white mt-1">
-                          ~${(position.claimableRewards * 0.05).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                      </div>
+                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
+                  <div className="text-lg font-bold text-white">{formatBalance(realQuaiClaimable)}</div>
+                  <div className="text-xs text-[#999999]">Claimable Now</div>
+                </div>
 
-                      <div className="text-center p-3 bg-[#0a0a0a] rounded-lg flex flex-col justify-center">
-                        {position.isInExitPeriod ? (
-                          <>
-                            <div className="text-lg font-bold text-white">{formatTimeLeft(position.timeUntilWithdrawalAvailable || 0)}</div>
-                            <div className="text-xs text-[#999999]">Exit Window</div>
-                          </>
-                        ) : (secondsLeft > 0 ? (
-                          <>
-                            <div className="text-lg font-bold text-white">{formatTimeLeft(secondsLeft)}</div>
-                            <div className="text-xs text-[#999999]">Until Unlock</div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="text-lg font-bold text-green-400">Unlocked</div>
-                            <div className="text-xs text-[#999999]">Status</div>
-                          </>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
+                  <div className="text-lg font-bold text-white">Instant</div>
+                  <div className="text-xs text-[#999999]">Rewards</div>
+                </div>
+
+                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg flex flex-col justify-center">
+                  {staking.userInfo?.isInExitPeriod ? (
+                    <>
+                      <div className="text-lg font-bold text-white">{formatTimeLeft(staking.userInfo?.timeUntilWithdrawalAvailable || 0)}</div>
+                      <div className="text-xs text-[#999999]">Exit Window</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-lg font-bold text-green-400">Active</div>
+                      <div className="text-xs text-[#999999]">Status</div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Quick Actions - More compact */}
+        {/* Quick Actions */}
         <Card className="modern-card">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg text-white">Quick Actions</CardTitle>
