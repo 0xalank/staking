@@ -34,17 +34,30 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: APP_TITLE,
   description: APP_DESCRIPTION,
-  metadataBase: new URL('https://nft.qu.ai'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://soap.qu.ai'),
   icons: {
     icon: '/images/quai-logo.png',
     shortcut: '/images/quai-logo.png',
     apple: '/images/quai-logo.png',
   },
   openGraph: {
-    images: '/opengraph-image.png',
+    title: APP_TITLE,
+    description: APP_DESCRIPTION,
+    type: 'website',
+    images: [
+      {
+        url: '/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: APP_TITLE,
+      },
+    ],
   },
   twitter: {
-    images: '/opengraph-image.png',
+    card: 'summary_large_image',
+    title: APP_TITLE,
+    description: APP_DESCRIPTION,
+    images: ['/opengraph-image.png'],
   },
 };
 
