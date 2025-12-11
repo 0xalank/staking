@@ -5,335 +5,180 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { GridTraffic } from '@/components/ui/grid-traffic';
 import { cn } from '@/lib/utils';
+import { Pickaxe, RefreshCcw, Flame, ShieldCheck, Layers, TrendingUp, Lock, Unlock } from 'lucide-react';
 
 export default function WhatIsSOAP() {
   return (
-    <main className="relative min-h-[100dvh] flex flex-col items-center pt-20 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
+    <main className="relative min-h-[100dvh] flex flex-col items-center pt-24 sm:pt-32 pb-8 px-4 overflow-hidden selection:bg-red-9/30">
       <div className="fixed inset-0 bg-[#050505] -z-20" />
       <GridTraffic />
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
-      <div className="w-full max-w-4xl mx-auto space-y-6 relative z-10 animate-in fade-in-up duration-700">
-        <Card className="modern-card border border-red-9/20">
-          <CardHeader>
-            <CardTitle className="text-3xl font-monorama font-bold text-white drop-shadow-[0_0_10px_rgba(226,41,1,0.2)]">What is SOAP?</CardTitle>
-            <CardDescription className="text-zinc-200">
-              Understanding the Subsidized Open-market Acquisition Protocol - How Quai turns merge-mining into token buybacks
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            {/* Introduction */}
-            <section className="space-y-4">
-              <div className="bg-red-9/5 border border-red-9/20 rounded-lg p-6">
-                <h2 className="text-xl font-monorama font-bold text-white mb-4">SOAP Overview</h2>
-                <p className="text-zinc-100 leading-relaxed mb-4">
-                  SOAP (Subsidized Open-market Acquisition Protocol) transforms traditional merge-mining into a protocol subsidy mechanism.
-                  Instead of miners receiving rewards from multiple chains directly (creating selling pressure), SOAP routes
-                  parent chain rewards to protocol-controlled addresses that automatically buy $QUAI tokens.
-                </p>
-                <p className="text-zinc-100 leading-relaxed">
-                  The purchased $QUAI is then either burned to reduce supply or distributed to time-locked stakers,
-                  creating continuous buy pressure while rewarding long-term network participants.
-                </p>
-              </div>
-            </section>
+      <div className="w-full max-w-5xl mx-auto space-y-12 relative z-10 animate-in fade-in-up duration-700">
 
-            {/* The Problem with Traditional Merge Mining */}
-            <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">The Merge-Mining Innovation</h2>
-              <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-6">
-                <p className="text-zinc-100 leading-relaxed mb-4">
-                  Traditional merge-mining allows miners to work on multiple blockchains simultaneously without splitting
-                  their computational power. Famous examples include Namecoin with Bitcoin, and Dogecoin with Litecoin.
+        {/* Header Section */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl md:text-5xl font-monorama font-bold text-white drop-shadow-[0_0_10px_rgba(226,41,1,0.2)]">What is SOAP?</h1>
+          <p className="text-zinc-400 max-w-3xl mx-auto text-lg leading-relaxed">
+            Understanding the <span className="text-white font-semibold">Subsidized Open-market Acquisition Protocol</span> — How Quai turns merge-mining into sustainable token buybacks.
+          </p>
+        </div>
+
+        {/* SOAP Overview Card */}
+        <Card className="modern-card border border-red-9/20 bg-zinc-900/50 backdrop-blur-sm overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-9 via-red-600 to-red-9" />
+          <CardContent className="p-8 md:p-10">
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+              <div className="flex-1 space-y-4">
+                <h2 className="text-2xl font-monorama font-bold text-white mb-2">The SOAP Mechanism</h2>
+                <p className="text-zinc-300 leading-relaxed text-lg">
+                  SOAP transforms traditional merge-mining into a protocol subsidy mechanism. Instead of miners receiving rewards directly (creating selling pressure), SOAP routes parent chain rewards to protocol-controlled addresses.
                 </p>
-                <p className="text-zinc-100 leading-relaxed mb-4">
-                  <strong className="text-white">The Problem:</strong> In traditional setups, miners receive rewards from both chains directly,
-                  often immediately selling the child chain&apos;s tokens, creating ongoing selling pressure.
-                </p>
-                <p className="text-zinc-100 leading-relaxed">
-                  <strong className="text-white">SOAP&apos;s Solution:</strong> Channel that flow into permanent protocol support by converting
-                  external mining rewards into $QUAI buybacks instead of direct miner payouts.
+                <p className="text-zinc-300 leading-relaxed text-lg">
+                  These rewards automatically buy $QUAI tokens, which are then either <span className="text-red-400 font-bold">burned</span> to reduce supply or <span className="text-green-400 font-bold">distributed</span> to stakers, creating continuous buy pressure.
                 </p>
               </div>
-            </section>
-
-            {/* How SOAP Works */}
-            <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">How SOAP Works</h2>
-              <div className="space-y-4">
-                <div className="flex gap-4 items-start">
-                  <div className="flex-shrink-0 w-10 h-10 bg-red-9 rounded-full flex items-center justify-center text-white font-bold shadow-md shadow-red-9/30">
-                    1
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <h3 className="text-lg font-monorama font-bold text-white">Multi-Chain Mining</h3>
-                    <p className="text-zinc-100">
-                      Miners with SHA256d (BCH), Scrypt (LTC/DOGE), or KAWPOW hardware can mine $QUAI while
-                      their parent chain rewards are automatically routed to protocol-controlled addresses.
-                    </p>
-                  </div>
+              <div className="flex-shrink-0 w-full md:w-auto flex justify-center">
+                <div className="w-32 h-32 rounded-full bg-red-9/10 border border-red-9/20 flex items-center justify-center shadow-[0_0_30px_rgba(226,41,1,0.15)] animate-pulse-slow">
+                  <RefreshCcw className="w-16 h-16 text-red-9" />
                 </div>
-
-                <div className="flex gap-4 items-start">
-                  <div className="flex-shrink-0 w-10 h-10 bg-red-9 rounded-full flex items-center justify-center text-white font-bold shadow-md shadow-red-9/30">
-                    2
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <h3 className="text-lg font-monorama font-bold text-white">Automatic $QUAI Buybacks</h3>
-                    <p className="text-zinc-100">
-                      Parent chain rewards (BCH, LTC, DOGE) are automatically converted to $QUAI at market rates,
-                      creating continuous buy pressure instead of selling pressure.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 items-start">
-                  <div className="flex-shrink-0 w-10 h-10 bg-red-9 rounded-full flex items-center justify-center text-white font-bold shadow-md shadow-red-9/30">
-                    3
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <h3 className="text-lg font-monorama font-bold text-white">Burn & Reward Distribution</h3>
-                    <p className="text-zinc-100">
-                      Purchased $QUAI is either burned to reduce supply or distributed to time-locked stakers,
-                      creating sustainable yield without token inflation.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 items-start">
-                  <div className="flex-shrink-0 w-10 h-10 bg-red-9 rounded-full flex items-center justify-center text-white font-bold shadow-md shadow-red-9/30">
-                    4
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <h3 className="text-lg font-monorama font-bold text-white">Enhanced Security</h3>
-                    <p className="text-zinc-100">
-                      Workshares from different algorithms contribute to block weight and economic finality,
-                      making reorg attacks more expensive while diversifying the security model.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Technical Innovation */}
-            <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Technical Innovation: Workshares & AuxPoW</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2 flex items-center gap-2">📋 Workshares</h3>
-                  <p className="text-zinc-100 mb-2">
-                    $QUAI blocks are produced exclusively by KAWPOW miners, but other algorithms
-                    (SHA256d, Scrypt) can submit &ldquo;workshares&rdquo; that get included in blocks.
-                  </p>
-                  <p className="text-zinc-100">
-                    Each workshare proves computational work on parent chains and earns proportional $QUAI rewards.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-purple-400 mb-2 flex items-center gap-2">🔗 AuxPoW Proofs</h3>
-                  <p className="text-zinc-100 mb-2">
-                    Auxiliary Proof-of-Work structures verify that parent chain blocks actually
-                    paid the protocol address and included required SOAP commitments.
-                  </p>
-                  <p className="text-zinc-100">
-                    This ensures trustless verification without requiring changes to existing mining infrastructure.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-green-400 mb-2 flex items-center gap-2">⚖️ Multi-Algorithm Security</h3>
-                  <p className="text-zinc-100 mb-2">
-                    Hardware diversity across SHA256d, Scrypt, and KAWPOW ASICs makes it harder
-                    for any single manufacturer or hardware class to dominate.
-                  </p>
-                  <p className="text-zinc-100">
-                    Each algorithm contributes to block weight, making reorgs proportionally more expensive.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-orange-400 mb-2 flex items-center gap-2">🎛️ Graceful Degradation</h3>
-                  <p className="text-zinc-100 mb-2">
-                    SOAP is designed to fail gracefully. If parent chain participation drops to zero,
-                    $QUAI continues producing KAWPOW blocks normally.
-                  </p>
-                  <p className="text-zinc-100">
-                    There&apos;s no liveness coupling - workshares are purely additive benefits.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Economic Model */}
-            <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Economic Model & Incentives</h2>
-              <div className="bg-red-9/5 border border-red-9/20 rounded-lg p-6">
-                <h3 className="text-lg font-monorama font-bold text-white mb-4">Why Miners Participate</h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <h4 className="text-md font-monorama font-bold text-green-400 mb-2">Parent Chain Miners (BCH/LTC/DOGE)</h4>
-                    <ul className="text-zinc-100 space-y-1">
-                      <li>• Receive $QUAI rewards for workshare submissions</li>
-                      <li>• Diversify earnings across multiple tokens</li>
-                      <li>• Contribute to Quai security while mining parent chains</li>
-                      <li>• Profitability depends on $QUAI price vs parent chain tokens</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-md font-monorama font-bold text-blue-400 mb-2">KAWPOW Miners</h4>
-                    <ul className="text-zinc-100 space-y-1">
-                      <li>• Receive standard $QUAI block rewards</li>
-                      <li>• Benefit from SOAP buyback pressure on $QUAI price</li>
-                      <li>• Secure Quai directly using KAWPOW algorithm</li>
-                      <li>• Block production unchanged from standard mining</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-6">
-                <h3 className="text-lg font-monorama font-bold text-white mb-3">Market Dynamics</h3>
-                <p className="text-zinc-100 mb-3">
-                  <strong className="text-white">$Best Case:</strong> Non-mercenary miners hold their $QUAI rewards while parent chain
-                  subsidies create continuous buy pressure, leading to net positive price action.
-                </p>
-                <p className="text-zinc-100 mb-3">
-                  <strong className="text-white">$Worst Case:</strong> Miners immediately sell $QUAI while protocol buys with subsidies,
-                  creating net-zero flow but maintaining price stability.
-                </p>
-                <p className="text-zinc-100">
-                  <strong className="text-white">Feedback Loop:</strong> Higher $QUAI prices → More hashrate → Stronger security →
-                  More attractive to parent chains → More subsidy flows → More buybacks.
-                </p>
-              </div>
-            </section>
-
-            {/* Key Benefits */}
-            <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Key Benefits</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-red-400 mb-2 flex items-center gap-2">
-                    🔥 Deflationary Mechanism
-                  </h3>
-                  <p className="text-zinc-100">
-                    Parent chain subsidies fund $QUAI burns, reducing total supply while external miners provide security
-                    without requiring $QUAI emission increases.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-green-400 mb-2 flex items-center gap-2">
-                    💰 Sustainable Rewards
-                  </h3>
-                  <p className="text-zinc-100">
-                    Staking rewards come from external protocol subsidies rather than inflation,
-                    creating sustainable yield backed by real economic activity.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2 flex items-center gap-2">
-                    🛡️ Enhanced Security
-                  </h3>
-                  <p className="text-zinc-100">
-                    Multi-algorithm workshares increase block weight and reorg costs while diversifying
-                    security across different hardware supply chains.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <h3 className="text-lg font-monorama font-bold text-purple-400 mb-2 flex items-center gap-2">
-                    📊 Inverted Economics
-                  </h3>
-                  <p className="text-zinc-100">
-                    Unlike traditional merge-mining that creates selling pressure, SOAP converts
-                    external mining into permanent buy pressure and protocol support.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* SOAP Staking Pools */}
-            <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">SOAP Staking Pools</h2>
-              <div className="space-y-4">
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-monorama font-bold text-red-400">Locked $QUAI Pool</h3>
-                    <span className="text-sm text-red-300 bg-red-9/30 px-2 py-1 rounded font-monorama uppercase">Highest APR</span>
-                  </div>
-                  <p className="text-zinc-100 mb-2">
-                    Time-locked $QUAI staking with commitment periods. Offers the highest rewards for long-term participants.
-                  </p>
-                  <div className="text-xs text-zinc-500">
-                    • Lock period: 30 days
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Benefits */}
-            <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Overall Benefits of SOAP</h2>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4 text-center">
-                  <div className="text-2xl mb-2 text-blue-400">📈</div>
-                  <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2">Sustainable Yield</h3>
-                  <p className="text-zinc-100">
-                    Protocol-backed rewards create sustainable yield without relying on token inflation.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4 text-center">
-                  <div className="text-2xl mb-2 text-red-400">🔥</div>
-                  <h3 className="text-lg font-monorama font-bold text-red-400 mb-2">Deflationary Pressure</h3>
-                  <p className="text-zinc-100">
-                    Regular token burns reduce supply over time.
-                  </p>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4 text-center">
-                  <div className="text-2xl mb-2 text-green-400">🎯</div>
-                  <h3 className="text-lg font-monorama font-bold text-green-400 mb-2">Aligned Incentives</h3>
-                  <p className="text-zinc-100">
-                    Rewards long-term holders and active participants in the ecosystem.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* CTA */}
-            <div className="bg-red-9/5 border border-red-9/20 rounded-lg p-6 text-center">
-              <h3 className="text-xl font-monorama font-bold text-white mb-2">Ready to Join SOAP?</h3>
-              <p className="text-zinc-100 mb-4">
-                Start earning sustainable rewards through the SOAP protocol today.
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Link href="/" className="block group/btn">
-                  <Button
-                      className="h-12 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-all clip-button px-8"
-                      style={{
-                          clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
-                      }}
-                  >
-                      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
-                      Start Staking
-                  </Button>
-                </Link>
-                <Link href="/calculator" className="block group/btn">
-                  <Button 
-                    variant="outline" 
-                    className="h-12 bg-zinc-900/50 border border-zinc-700 text-zinc-100 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase px-8"
-                  >
-                    Use Calculator
-                  </Button>
-                </Link>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* The Problem & Solution */}
+        <section className="grid md:grid-cols-2 gap-6">
+          <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-8 hover:border-red-9/20 transition-all group">
+            <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-9/10 transition-colors">
+              <Layers className="w-6 h-6 text-zinc-400 group-hover:text-red-9 transition-colors" />
+            </div>
+            <h3 className="text-xl font-monorama font-bold text-white mb-3">The Problem</h3>
+            <p className="text-zinc-400 leading-relaxed">
+              Traditional merge-mining allows miners to secure multiple chains. However, miners often immediately sell the child chain&apos;s tokens to cover costs, creating persistent selling pressure on the asset.
+            </p>
+          </div>
+
+          <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-8 hover:border-red-9/20 transition-all group">
+            <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-900/20 transition-colors">
+              <TrendingUp className="w-6 h-6 text-zinc-400 group-hover:text-green-400 transition-colors" />
+            </div>
+            <h3 className="text-xl font-monorama font-bold text-white mb-3">SOAP&apos;s Solution</h3>
+            <p className="text-zinc-400 leading-relaxed">
+              Channel that flow into permanent protocol support. By converting external mining rewards into $QUAI buybacks instead of direct miner payouts, SOAP turns merge-mining into a net-positive force.
+            </p>
+          </div>
+        </section>
+
+        {/* Step-by-Step Process */}
+        <section className="space-y-8">
+          <h2 className="text-2xl font-monorama font-bold text-white border-l-4 border-red-9 pl-4">How It Works</h2>
+          <div className="grid md:grid-cols-4 gap-4">
+            {[
+              {
+                icon: <Pickaxe className="w-6 h-6" />,
+                title: "Multi-Chain Mining",
+                desc: "Miners secure QUAI while mining parent chains (BCH, LTC, DOGE)."
+              },
+              {
+                icon: <RefreshCcw className="w-6 h-6" />,
+                title: "Auto-Buybacks",
+                desc: "Parent chain rewards are converted to $QUAI at market rates."
+              },
+              {
+                icon: <Flame className="w-6 h-6" />,
+                title: "Burn & Distribute",
+                desc: "Purchased $QUAI is burned or sent to stakers as sustainable yield."
+              },
+              {
+                icon: <ShieldCheck className="w-6 h-6" />,
+                title: "Enhanced Security",
+                desc: "Diverse algorithms increase block weight and economic finality."
+              }
+            ].map((step, i) => (
+              <div key={i} className="bg-zinc-900/30 border border-white/5 p-6 rounded-xl relative group hover:-translate-y-1 transition-transform duration-300">
+                <div className="absolute top-4 right-4 text-6xl font-monorama font-bold text-white/5 select-none">{i + 1}</div>
+                <div className="w-12 h-12 bg-red-9/10 rounded-full flex items-center justify-center mb-4 text-red-9 group-hover:bg-red-9 group-hover:text-white transition-colors">
+                  {step.icon}
+                </div>
+                <h3 className="text-lg font-monorama font-bold text-white mb-2 relative z-10">{step.title}</h3>
+                <p className="text-sm text-zinc-400 relative z-10">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Technical Deep Dive */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-monorama font-bold text-white border-l-4 border-red-9 pl-4">Technical Innovation</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="p-6 bg-zinc-900/30 border border-white/5 rounded-xl">
+              <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2">📋 Workshares</h3>
+              <p className="text-zinc-400 text-sm">
+                $QUAI blocks are produced by KAWPOW miners, but other algorithms (SHA256d, Scrypt) submit "workshares". Each workshare proves computational work on parent chains and earns proportional rewards.
+              </p>
+            </div>
+            <div className="p-6 bg-zinc-900/30 border border-white/5 rounded-xl">
+              <h3 className="text-lg font-monorama font-bold text-purple-400 mb-2">🔗 AuxPoW Proofs</h3>
+              <p className="text-zinc-400 text-sm">
+                Auxiliary Proof-of-Work structures verify that parent chain blocks actually paid the protocol address. This ensures trustless verification without changes to existing mining pools.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* SOAP Staking Pools */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-monorama font-bold text-white border-l-4 border-red-9 pl-4">Staking Pools</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-red-900/20 to-zinc-900 border border-red-9/30 rounded-xl p-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3">
+                <span className="bg-red-9 text-white text-xs font-bold px-2 py-1 rounded font-monorama uppercase">Highest APR</span>
+              </div>
+              <Lock className="w-8 h-8 text-red-9 mb-4" />
+              <h3 className="text-xl font-monorama font-bold text-white mb-2">Locked $QUAI Pool</h3>
+              <p className="text-zinc-400 text-sm mb-4">
+                Time-locked staking for maximum rewards. Best for long-term holders committed to the protocol.
+              </p>
+              <ul className="text-xs text-zinc-500 space-y-1 font-mono">
+                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-red-500 rounded-full" /> 30-day lock period</li>
+              </ul>
+            </div>
+
+
+          </div>
+        </section>
+
+        {/* CTA */}
+        <div className="bg-zinc-900/80 border border-red-9/20 rounded-2xl p-8 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/images/grid-pattern.png')] opacity-10 pointer-events-none" />
+          <h3 className="text-2xl font-monorama font-bold text-white mb-3 relative z-10">Ready to Join SOAP?</h3>
+          <p className="text-zinc-400 mb-8 max-w-xl mx-auto relative z-10">
+            Start earning sustainable rewards through the first Proof-of-Work powered yield protocol.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+            <Link href="/" className="group/btn w-full sm:w-auto">
+              <Button
+                className="w-full sm:w-auto h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-all clip-button px-8 text-lg"
+                style={{
+                  clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                }}
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
+                Start Staking
+              </Button>
+            </Link>
+            <Link href="/calculator" className="w-full sm:w-auto">
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto h-14 bg-zinc-900 border border-zinc-700 text-zinc-300 hover:bg-white/5 hover:text-white font-monorama font-bold uppercase tracking-widest px-8 text-lg"
+              >
+                Calculator
+              </Button>
+            </Link>
+          </div>
+        </div>
+
       </div>
     </main>
   );

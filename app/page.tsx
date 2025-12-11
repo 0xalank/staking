@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { StateContext } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -77,7 +77,7 @@ const PoolCard = ({ stakingData, isLoading }: {
              {isLoading ? (
                <div className="h-6 w-16 bg-red-9/10 animate-pulse rounded" />
              ) : (
-               <div className="text-xl font-bold font-monorama text-white">
+               <div className="text-xl font-bold font-monorama bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
                  {stakingData?.contractInfo?.apy?.toLocaleString('en-US', { maximumFractionDigits: 1 })}%
                </div>
              )}

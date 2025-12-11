@@ -48,7 +48,7 @@ export default function StakePage() {
   // Only support native-quai pool
   if (poolId !== 'native-quai') {
     return (
-      <main className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
+      <main className="relative min-h-[100dvh] flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
         <div className="fixed inset-0 bg-[#050505] -z-20" />
         <GridTraffic />
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
@@ -62,7 +62,7 @@ export default function StakePage() {
                     clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
                 }}
             >
-                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
                 Back to Pools
             </Button>
           </Link>
@@ -72,12 +72,12 @@ export default function StakePage() {
   }
 
   return (
-    <main className="relative min-h-[100dvh] flex flex-col items-center pt-20 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
+    <main className="relative min-h-[100dvh] flex flex-col items-center pt-24 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
       <div className="fixed inset-0 bg-[#050505] -z-20" />
       <GridTraffic />
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
-      <div className="w-full max-w-2xl mx-auto relative z-10 animate-in fade-in-up duration-700">
+      <div className="w-full max-w-3xl mx-auto relative z-10 animate-in fade-in-up duration-700">
 
         {/* Back Button */}
         <div className="mb-4 sm:mb-6">
@@ -88,7 +88,7 @@ export default function StakePage() {
         </div>
 
         {/* Pool Header */}
-        <Card className="modern-card border border-red-9/20 mb-6">
+        <Card className="modern-card border border-red-9/20 mb-6 bg-zinc-900/50 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap">
               <TokenLogo size={48} />
@@ -229,7 +229,7 @@ export default function StakePage() {
 
                 {staking.contractInfo.hasUserLimit && (
                   <div className="p-3 bg-zinc-900 border border-red-9/20 rounded-md">
-                    <p className="text-zinc-400 text-sm">
+                    <p className="text-zinc-400 text-sm font-monorama">
                       Pool Limit Per User: {Number(staking.contractInfo.poolLimitPerUserFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} $QUAI
                     </p>
                   </div>

@@ -223,21 +223,19 @@ const SOAPDistributionModel = () => {
                     <div className="flex bg-zinc-900 border border-red-9/20 rounded-lg p-1">
                       <button
                         onClick={() => setInputMode('lockedPct')}
-                        className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
-                          inputMode === 'lockedPct'
+                        className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${inputMode === 'lockedPct'
                             ? 'bg-red-9 text-white font-medium shadow-red-9/30 shadow-md'
                             : 'text-zinc-400 hover:text-white'
-                        }`}
+                          }`}
                       >
                         Set APR
                       </button>
                       <button
                         onClick={() => setInputMode('quaiPrice')}
-                        className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
-                          inputMode === 'quaiPrice'
+                        className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${inputMode === 'quaiPrice'
                             ? 'bg-red-9 text-white font-medium shadow-red-9/30 shadow-md'
                             : 'text-zinc-400 hover:text-white'
-                        }`}
+                          }`}
                       >
                         Set Price
                       </button>
@@ -489,7 +487,7 @@ const SOAPDistributionModel = () => {
                     <h4 className="text-md font-monorama font-bold text-white mb-1">Multi-Chain Mining</h4>
                     <p className="text-zinc-400 text-sm">
                       Miners with SHA256d (BCH), Scrypt (LTC/DOGE), or KAWPOW hardware can mine $QUAI while
-                      their parent chain rewards are automatically routed to protocol-controlled addresses.
+                      their parent chain rewards are routed to protocol-controlled addresses.
                     </p>
                   </div>
                 </div>
@@ -499,9 +497,9 @@ const SOAPDistributionModel = () => {
                     2
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-md font-monorama font-bold text-white mb-1">Automatic $QUAI Buybacks</h4>
+                    <h4 className="text-md font-monorama font-bold text-white mb-1">$QUAI Buybacks</h4>
                     <p className="text-zinc-400 text-sm">
-                      Parent chain rewards (BCH, LTC, DOGE) are automatically converted to $QUAI at market rates,
+                      Parent chain rewards (BCH, LTC, DOGE) are converted to $QUAI at market rates,
                       creating continuous buy pressure instead of selling pressure.
                     </p>
                   </div>

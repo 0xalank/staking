@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useRef } from 'react';
 
 export const GridTraffic = () => {
@@ -34,13 +33,13 @@ export const GridTraffic = () => {
     const createParticle = () => {
       // Spawn on a grid line
       const axis = Math.random() > 0.5 ? 'x' : 'y';
-      const x = axis === 'x'
-        ? Math.random() * canvas.width
+      const x = axis === 'x' 
+        ? Math.random() * canvas.width 
         : Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
-      const y = axis === 'y'
-        ? Math.random() * canvas.height
+      const y = axis === 'y' 
+        ? Math.random() * canvas.height 
         : Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
-
+      
       const speed = 2 + Math.random() * 2;
       const vx = axis === 'x' ? (Math.random() > 0.5 ? speed : -speed) : 0;
       const vy = axis === 'y' ? (Math.random() > 0.5 ? speed : -speed) : 0;
@@ -61,11 +60,11 @@ export const GridTraffic = () => {
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+      
       // Update and draw particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-
+        
         // Move
         p.x += p.vx;
         p.y += p.vy;

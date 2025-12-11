@@ -373,7 +373,7 @@ export function StakingInfo({
 
   return (
     <div className="space-y-4">
-      <Card className="modern-card overflow-hidden border border-red-9/20">
+      <Card className="modern-card overflow-hidden border border-red-9/20 bg-zinc-900/50 backdrop-blur-sm">
         <CardContent className="space-y-4">
           {/* User Staking Info */}
           {userInfo && userInfo.stakedAmount > BigInt(0) && (
