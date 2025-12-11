@@ -20,7 +20,8 @@ const disconnectWallet = async (dispatch: any) => {
   } finally {
     // Always clear local state
     dispatch({ type: 'SET_ACCOUNT', payload: undefined });
-    dispatch({ type: 'SET_WEB3_PROVIDER', payload: undefined });
+    // Note: Keep SET_PROVIDER so we still show "Connect" not "Install Pelagus"
+    // The provider (window.pelagus) still exists, user just disconnected
   }
 };
 

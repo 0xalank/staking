@@ -139,7 +139,7 @@ export default function Portfolio() {
               <p className="text-zinc-400 mb-6 animate-in fade-in-up duration-700 delay-200">
                 You don&apos;t have any active staking positions yet. Start staking to see your portfolio here.
               </p>
-              <Link href="/" className="block group/btn">
+              <Link href="/stake/native-quai" className="block group/btn">
                   <Button
                       className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
                       style={{
