@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { StateContext, DispatchContext } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,6 +49,29 @@ const TokenLogo = ({ size = 24 }: { size?: number }) => {
 export default function Portfolio() {
   const { account } = useContext(StateContext);
   const staking = useStaking();
+  const [activeAction, setActiveAction] = useState<'compound' | 'execute' | 'cancel' | null>(null);
+
+  // Reset activeAction when transaction completes
+  useEffect(() => {
+    if (!staking.isTransacting) {
+      setActiveAction(null);
+    }
+  }, [staking.isTransacting]);
+
+  const handleCompound = async () => {
+    setActiveAction('compound');
+    await staking.compound();
+  };
+
+  const handleExecuteWithdraw = async () => {
+    setActiveAction('execute');
+    await staking.executeWithdraw();
+  };
+
+  const handleCancelWithdraw = async () => {
+    setActiveAction('cancel');
+    await staking.cancelWithdraw();
+  };
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -73,8 +96,10 @@ export default function Portfolio() {
   const realQuaiStaked = staking.userInfo ? Number(staking.userInfo.stakedAmountFormatted) : 0;
   const realQuaiClaimable = staking.userInfo ? Number(staking.userInfo.claimableRewardsFormatted) : 0;
   const realQuaiApr = staking.contractInfo ? staking.contractInfo.apy : 0;
+  const realQuaiPendingWithdrawal = staking.userInfo ? Number(staking.userInfo.withdrawalAmountFormatted || '0') : 0;
 
-  const hasPosition = realQuaiStaked > 0;
+  // User has a position if they have staked amount OR pending withdrawal
+  const hasPosition = realQuaiStaked > 0 || staking.userInfo?.isInExitPeriod;
 
   if (!account?.addr) {
     return (
@@ -199,11 +224,11 @@ export default function Portfolio() {
                   style={{
                     clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
                   }}
-                  onClick={() => staking.compound()}
+                  onClick={handleCompound}
                   disabled={staking.isTransacting || staking.userInfo?.isInExitPeriod}
                 >
                   <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
-                  {staking.isTransacting ? 'Compounding...' : 'Compound Rewards'}
+                  {activeAction === 'compound' && staking.isTransacting ? 'Compounding...' : 'Compound Rewards'}
                 </Button>
               </div>
             </CardContent>
@@ -227,34 +252,34 @@ export default function Portfolio() {
                     <h3 className="text-2xl font-monorama font-bold text-white">QUAI Staking Pool</h3>
                   </div>
                 </div>
-                <div className="flex gap-3 w-full md:w-auto">
+                <div className="flex gap-2 w-full md:w-auto">
                   {/* Withdrawal Actions */}
                   {staking.userInfo?.isInExitPeriod && (
                     staking.userInfo?.canExecuteWithdraw ? (
                       <Button
                         size="lg"
-                        className="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white font-monorama font-bold uppercase tracking-wide h-12"
-                        onClick={() => staking.executeWithdraw()}
+                        className="bg-green-600 hover:bg-green-700 text-white font-monorama font-bold uppercase tracking-wide h-12"
+                        onClick={handleExecuteWithdraw}
                         disabled={staking.isTransacting}
                       >
-                        {staking.isTransacting ? 'Processing...' : 'Complete Withdrawal'}
+                        {activeAction === 'execute' && staking.isTransacting ? 'Processing...' : 'Complete Withdrawal'}
                       </Button>
                     ) : (
                       <Button
-                        size="lg"
-                        className="flex-1 md:flex-none bg-yellow-600 hover:bg-yellow-700 text-white font-monorama font-bold uppercase tracking-wide h-12"
-                        onClick={() => staking.cancelWithdraw()}
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white font-monorama font-bold uppercase tracking-wide h-12 text-xs px-3"
+                        onClick={handleCancelWithdraw}
                         disabled={staking.isTransacting}
                       >
-                        Cancel Withdrawal
+                        {activeAction === 'cancel' && staking.isTransacting ? '...' : 'Cancel Withdrawal'}
                       </Button>
                     )
                   )}
 
-                  <Link href="/stake/native-quai?mode=manage" className="flex-1 md:flex-none">
+                  <Link href="/stake/native-quai?mode=manage">
                     <Button
                       size="lg"
-                      className="w-full bg-zinc-800 border border-zinc-700 text-white hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama font-bold uppercase tracking-wide transition-all duration-300 h-12 group"
+                      className="bg-zinc-800 border border-zinc-700 text-white hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama font-bold uppercase tracking-wide transition-all duration-300 h-12 group"
                     >
                       Manage Stake
                       <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -266,8 +291,18 @@ export default function Portfolio() {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 bg-zinc-900 border border-white/5 rounded-xl hover:border-red-9/20 transition-colors group">
-                  <div className="text-xs text-zinc-400 font-monorama uppercase tracking-wider mb-1">Staked Amount</div>
-                  <div className="text-2xl font-monorama font-bold text-white group-hover:text-red-100 transition-colors">{realQuaiStaked.toLocaleString()} QUAI</div>
+                  <div className="text-xs text-zinc-400 font-monorama uppercase tracking-wider mb-1">
+                    {staking.userInfo?.isInExitPeriod && realQuaiStaked === 0 ? 'Pending Withdrawal' : 'Staked Amount'}
+                  </div>
+                  <div className="text-2xl font-monorama font-bold text-white group-hover:text-red-100 transition-colors">
+                    {staking.userInfo?.isInExitPeriod && realQuaiStaked === 0
+                      ? `${realQuaiPendingWithdrawal.toLocaleString()} QUAI`
+                      : `${realQuaiStaked.toLocaleString()} QUAI`
+                    }
+                  </div>
+                  {staking.userInfo?.isInExitPeriod && realQuaiStaked > 0 && (
+                    <div className="text-xs text-orange-400 mt-1">+ {realQuaiPendingWithdrawal.toLocaleString()} pending</div>
+                  )}
                 </div>
 
                 <div className="p-4 bg-zinc-900 border border-white/5 rounded-xl hover:border-red-9/20 transition-colors group">
@@ -283,10 +318,14 @@ export default function Portfolio() {
                 <div className="p-4 bg-zinc-900 border border-white/5 rounded-xl hover:border-red-9/20 transition-colors group">
                   <div className="text-xs text-zinc-400 font-monorama uppercase tracking-wider mb-1">Status</div>
                   {staking.userInfo?.isInExitPeriod ? (
-                    <>
-                      <div className="text-xl font-monorama font-bold text-white mb-1">{formatTimeLeft(staking.userInfo?.timeUntilWithdrawalAvailable || 0)}</div>
-                      <div className="text-xs text-zinc-500">Exit Window</div>
-                    </>
+                    staking.userInfo?.canExecuteWithdraw ? (
+                      <div className="text-2xl font-monorama font-bold text-green-400">Ready</div>
+                    ) : (
+                      <>
+                        <div className="text-xl font-monorama font-bold text-orange-400 mb-1">{formatTimeLeft(staking.userInfo?.timeUntilWithdrawalAvailable || 0)}</div>
+                        <div className="text-xs text-zinc-500">Until Withdrawal</div>
+                      </>
+                    )
                   ) : (
                     <div className="text-2xl font-monorama font-bold text-green-400">Active</div>
                   )}

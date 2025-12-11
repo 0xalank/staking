@@ -466,7 +466,15 @@ export function StakingInfo({
                       <button
                         type="button"
                         className="px-3 py-1 rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 font-monorama text-sm uppercase"
-                        onClick={() => setDepositAmount(availableBalanceFormatted)}
+                        onClick={() => {
+                          // Remove commas and parse balance, leave 0.1 QUAI for gas
+                          const rawBalance = parseFloat((availableBalanceFormatted || '0').replace(/,/g, ''));
+                          const gasReserve = 0.1;
+                          const maxDeposit = Math.max(0, rawBalance - gasReserve);
+                          // Format with up to 6 decimals, remove trailing zeros
+                          const formatted = maxDeposit > 0 ? parseFloat(maxDeposit.toFixed(6)).toString() : '0';
+                          setDepositAmount(formatInputWithCommas(formatted));
+                        }}
                         disabled={isTransacting}
                       >
                         Max
