@@ -101,6 +101,7 @@ const config = {
           10: '#CA2600',
           11: '#FF8F76',
         },
+        pelagusBlue: '#1775E4',
       },
       borderRadius: {
         lg: 'var(--radius)',

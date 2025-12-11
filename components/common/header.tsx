@@ -108,7 +108,7 @@ export default function Header() {
                 <Button 
                   onClick={connectHandler} 
                   disabled={!!account}
-                  className="bg-red-9/10 text-red-9 border border-red-9/50 hover:bg-red-9 hover:text-white font-monorama uppercase tracking-wider transition-all duration-300 shadow-[0_0_10px_rgba(226,41,1,0.1)] hover:shadow-[0_0_20px_rgba(226,41,1,0.4)]"
+                  className="bg-pelagusBlue/10 text-pelagusBlue border border-pelagusBlue/50 hover:bg-pelagusBlue hover:text-white font-monorama uppercase tracking-wider transition-all duration-300 shadow-[0_0_10px_rgba(23,117,228,0.1)] hover:shadow-[0_0_20px_rgba(23,117,228,0.4)]"
                 >
                   Install Pelagus
                 </Button>
@@ -120,8 +120,8 @@ export default function Header() {
                 className={cn(
                   "font-monorama uppercase tracking-wider border transition-all duration-300",
                   account 
-                    ? "bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-red-9 hover:text-white"
-                    : "bg-red-9 text-white border-red-9 hover:bg-red-8 hover:shadow-[0_0_15px_rgba(226,41,1,0.4)]"
+                    ? "bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-pelagusBlue hover:text-white"
+                    : "bg-pelagusBlue text-white border-pelagusBlue hover:bg-pelagusBlue/80 hover:shadow-[0_0_15px_rgba(23,117,228,0.4)]"
                 )}
               >
                 {account ? (
@@ -137,7 +137,7 @@ export default function Header() {
                       alt="Pelagus"
                       width={16}
                       height={16}
-                      className="rounded-sm opacity-90"
+                      className="rounded-sm opacity-90 object-contain"
                     />
                     <span>Connect</span>
                   </div>
