@@ -9,7 +9,7 @@ const GetErrorPages = (status: string) => {
 
   const relocateToHomePage = useCallback(() => {
     replace('/');
-  }, []);
+  }, [replace]);
 
   switch (status) {
     case '500':

@@ -115,7 +115,7 @@ export default function WhatIsSOAP() {
             <div className="p-6 bg-zinc-900/30 border border-white/5 rounded-xl">
               <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2">📋 Workshares</h3>
               <p className="text-zinc-400 text-sm">
-                $QUAI blocks are produced by KAWPOW miners, but other algorithms (SHA256d, Scrypt) submit "workshares". Each workshare proves computational work on parent chains and earns proportional rewards.
+                $QUAI blocks are produced by KAWPOW miners, but other algorithms (SHA256d, Scrypt) submit &quot;workshares&quot;. Each workshare proves computational work on parent chains and earns proportional rewards.
               </p>
             </div>
             <div className="p-6 bg-zinc-900/30 border border-white/5 rounded-xl">
