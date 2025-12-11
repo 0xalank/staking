@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { GridTraffic } from '../page'; // Assuming GridTraffic is exported from homepage
+import { GridTraffic } from '@/components/ui/grid-traffic';
 import { cn } from '@/lib/utils';
 
 export default function WhatIsSOAP() {

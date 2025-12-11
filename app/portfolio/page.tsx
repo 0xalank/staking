@@ -10,7 +10,7 @@ import { useStaking } from '@/lib/hooks/useStaking';
 import { formatBalance } from '@/lib/utils/formatBalance';
 import { requestAccounts } from '@/lib/wallet';
 import { cn } from '@/lib/utils';
-import { GridTraffic } from '../page'; // Assuming GridTraffic is exported from homepage
+import { GridTraffic } from '@/components/ui/grid-traffic';
 
 // Connect Wallet Button with particle effects
 const ConnectWalletButton = () => {

@@ -136,7 +136,7 @@ export function StakingInfo({
   // Component for displaying rewards (instant rewards - no vesting)
   const RewardsDisplay = () => {
     const hasClaimableRewards = userInfo && userInfo.claimableRewards > BigInt(0);
-    const hasDelayedRewards = userInfo?.delayedRewards?.length > 0;
+    const hasDelayedRewards = (userInfo?.delayedRewards?.length ?? 0) > 0;
 
     return (
       <div className="space-y-3">

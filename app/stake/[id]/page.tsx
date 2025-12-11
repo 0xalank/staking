@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useStaking } from '@/lib/hooks/useStaking';
 import { StakingInfo } from '@/components/ui/staking-info';
-import { GridTraffic } from '../../page'; // Assuming GridTraffic is exported from homepage
+import { GridTraffic } from '@/components/ui/grid-traffic';
 import { cn } from '@/lib/utils';
 
 // Token Logo Component

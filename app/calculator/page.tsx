@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { GridTraffic } from '../page'; // Assuming GridTraffic is exported from homepage
+import { GridTraffic } from '@/components/ui/grid-traffic';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
