@@ -10,6 +10,8 @@ import { Inter } from 'next/font/google';
 import { StateProvider } from '../store';
 import { APP_TITLE, APP_DESCRIPTION } from '@/lib/config';
 import Header from '@/components/common/header';
+import { RedirectModal } from '@/components/redirectModal/RedirectModal';
+import { FooterSocials } from '@/components/common/FooterSocials';
 
 const satoshiFont = localFont({
   src: [
@@ -77,6 +79,8 @@ export default function RootLayout({
           <Providers>
             <Header />
             <div className="relative">{children}</div>
+            <FooterSocials />
+            <RedirectModal />
             <Toaster />
             <Analytics />
           </Providers>

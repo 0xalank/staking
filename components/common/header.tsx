@@ -73,6 +73,7 @@ export default function Header() {
     { label: 'SOAP Calculator', href: '/calculator' },
     { label: 'How to Stake', href: '/how-to-stake' },
     { label: 'What is SOAP?', href: '/what-is-soap' },
+    { label: 'Subsidy Tracker', href: 'https://soap-dashboard-eight.vercel.app/', external: true },
   ];
 
   return (
@@ -105,14 +106,16 @@ export default function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    target={item.external ? "_blank" : undefined}
                     className={cn(
-                      'relative px-3 py-1.5 text-sm font-monorama tracking-wide uppercase transition-all duration-300 rounded-full whitespace-nowrap',
+                      'relative px-3 py-1.5 text-sm font-monorama tracking-wide uppercase transition-all duration-300 rounded-full whitespace-nowrap flex items-center gap-1',
                       isActive
                         ? 'text-white bg-red-9 shadow-[0_0_15px_rgba(226,41,1,0.4)]'
                         : 'text-zinc-400 hover:text-white hover:bg-white/5'
                     )}
                   >
                     {item.label}
+                    {item.external && <ExternalLink className="h-3 w-3 opacity-70" />}
                   </Link>
                 );
               })}
@@ -120,24 +123,7 @@ export default function Header() {
 
             {/* Right Section: Socials & Wallet & Hamburger - pushed to far right */}
             <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-
-              {/* Social Icons - Hidden on smaller screens, show on xl */}
-              <div className="hidden xl:flex items-center gap-1 pr-3 border-r border-white/10">
-                {[
-                  { icon: <FaXTwitter />, href: 'https://x.com/QuaiNetwork' },
-                  { icon: <FaDiscord />, href: 'https://discord.gg/quai' },
-                  { icon: <FaYoutube />, href: 'https://www.youtube.com/@QuaiNetwork' },
-                  { icon: <FaTelegram />, href: 'https://t.me/QuaiNetwork' },
-                  { icon: <PiGlobe />, href: 'https://qu.ai' },
-                ].map((social, i) => (
-                  <Link key={i} target="_blank" href={social.href} className="group">
-                    <div className="p-1.5 text-zinc-400 hover:text-red-9 hover:bg-red-9/10 rounded-md transition-all duration-300 border border-transparent hover:border-red-9/20 text-sm">
-                      {social.icon}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-
+              
               {/* Wallet Button */}
               {web3Provider === undefined ? (
                 <a href="https://chromewebstore.google.com/detail/pelagus/nhccebmfjcbhghphpclcfdkkekheegop" target="_blank">
@@ -264,14 +250,16 @@ export default function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    target={item.external ? "_blank" : undefined}
                     className={cn(
-                      'px-4 py-3 text-sm font-monorama tracking-wide uppercase rounded-lg transition-all duration-200 border border-transparent',
+                      'px-4 py-3 text-sm font-monorama tracking-wide uppercase rounded-lg transition-all duration-200 border border-transparent flex items-center justify-between',
                       isActive 
                         ? 'bg-red-9/10 text-red-9 border-red-9/30' 
                         : 'text-zinc-400 hover:text-white hover:bg-white/5'
                     )}
                   >
                     {item.label}
+                    {item.external && <ExternalLink className="h-3 w-3 opacity-70" />}
                   </Link>
                 );
               })}
