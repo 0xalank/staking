@@ -184,12 +184,20 @@
       @apply bg-gray-11 rounded-2xl;
     }
   }
+  html {
+    overflow-x: hidden;
+    max-width: 100vw;
+    overscroll-behavior-y: none;
+  }
+  
   body {
     @apply bg-background text-foreground;
     background: #050505;
     color: #ededed;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     font-optical-sizing: auto;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   
   /* Enhanced typography */

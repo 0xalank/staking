@@ -160,76 +160,36 @@ export default function Home() {
   const staking = useStaking();
 
   return (
-    <main className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
-      
+    <main className="relative min-h-[100dvh] flex flex-col items-center pt-24 md:pt-28 p-4 overflow-hidden selection:bg-red-9/30">
+
       {/* Background Systems */}
       <div className="fixed inset-0 bg-[#050505] -z-20" />
       <GridTraffic />
-      
+
       {/* Glow Center */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
-      <div className="w-full max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-12">
-        
-                {/* Hero Section */}
-        
-                <div className="text-center space-y-6">
-        
-                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-9/50 bg-red-9/20 backdrop-blur-md mb-4 animate-fade-in-down">
-        
-                      <span className="relative flex h-3 w-3">
-        
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-9 opacity-75"></span>
-        
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-9"></span>
-        
-                      </span>
-        
-                      <span className="text-sm font-monorama text-red-9 font-bold tracking-widest uppercase">Now Live</span>
-        
-                   </div>
-        
-                   
-        
-                              <h1 className="text-6xl md:text-8xl font-monorama font-bold text-white tracking-tight uppercase leading-none animate-in fade-in-up duration-700 delay-100">
-        
-                   
-        
-                                 <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">Proof-of-Work Powered</span><br />
-        
-                   
-        
-                                 <span className="text-red-9 drop-shadow-[0_0_15px_rgba(226,41,1,0.5)]">Yield</span>
-        
-                   
-        
-                              </h1>
-        
-                   
-        
-                   
-        
-                   
-        
-                                         <p className="text-zinc-400 max-w-lg mx-auto text-lg md:text-xl font-light animate-in fade-in-up duration-700 delay-200">
-        
-                   
-        
-                   
-        
-                   
-        
-                                            Real, sustainable yield distributed from $QUAI buybacks as part of the Subsidized Open-market Acquisition Protocol (SOAP). Learn more at <Link href="/what-is-soap" className="text-red-9 hover:text-red-7 underline">&ldquo;What is SOAP?&rdquo;</Link>
-        
-                   
-        
-                   
-        
-                   
-        
-                                         </p>
-        
-                </div>
+      <div className="w-full max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-8">
+
+        {/* Hero Section */}
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-9/50 bg-red-9/20 backdrop-blur-md mb-2 animate-fade-in-down">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-9 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-9"></span>
+            </span>
+            <span className="text-sm font-monorama text-red-9 font-bold tracking-widest uppercase">Now Live</span>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-monorama font-bold text-white tracking-tight uppercase leading-none animate-in fade-in-up duration-700 delay-100">
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">Proof-of-Work Powered</span><br />
+            <span className="text-red-9 drop-shadow-[0_0_15px_rgba(226,41,1,0.5)]">Yield</span>
+          </h1>
+
+          <p className="text-zinc-400 max-w-lg mx-auto text-base md:text-lg font-light animate-in fade-in-up duration-700 delay-200">
+            Real, sustainable yield distributed from $QUAI buybacks as part of the Subsidized Open-market Acquisition Protocol (SOAP). Learn more at <Link href="/what-is-soap" className="text-red-9 hover:text-red-7 underline">&ldquo;What is SOAP?&rdquo;</Link>
+          </p>
+        </div>
 
         {/* Interactive Staking Module */}
         <div className="w-full max-w-md">

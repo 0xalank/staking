@@ -556,10 +556,47 @@ export function useStaking() {
     }
   }, [account, web3Provider, userInfo, loadStakingInfo]);
 
-  // Cancel withdrawal request (not available in this contract version)
+  // Cancel withdrawal request and return funds to active staking
   const cancelWithdraw = useCallback(async () => {
-    setError('Cancel withdrawal is not available. Once requested, withdrawals cannot be cancelled.');
-  }, []);
+    if (!account?.addr || !web3Provider) {
+      setError('Please connect your wallet');
+      return;
+    }
+
+    if (!userInfo) {
+      setError('No staking information available');
+      return;
+    }
+
+    if (!userInfo.isInExitPeriod || userInfo.withdrawalAmount === BigInt(0)) {
+      setError('No pending withdrawal to cancel');
+      return;
+    }
+
+    setIsTransacting(true);
+    setError(null);
+    setTransactionHash(null);
+
+    try {
+      const signer = await web3Provider.getSigner();
+      const stakingContract = new Contract(STAKING_CONTRACT_ADDRESS, SmartChefNativeABI, signer);
+
+      // Send cancel withdrawal transaction
+      const tx = await stakingContract.cancelWithdrawal({ gasLimit: 500000 });
+      setTransactionHash(tx.hash);
+
+      // Wait for confirmation
+      await tx.wait();
+
+      // Reload staking info
+      await loadStakingInfo();
+    } catch (error: any) {
+      console.error('Cancel withdrawal failed:', error);
+      setError(error.message || 'Cancel withdrawal failed. Please try again.');
+    } finally {
+      setIsTransacting(false);
+    }
+  }, [account, web3Provider, userInfo, loadStakingInfo]);
 
   // Claim rewards (now claims claimable delayed rewards)
   const claimRewards = useCallback(async () => {

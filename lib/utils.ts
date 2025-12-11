@@ -8,8 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 
 // ---- data formatting ---- //
 
-export const shortenAddress = (address: string) => {
-  if (address === '') return '';
+export const shortenAddress = (address: string | null | undefined) => {
+  if (!address) return '';
   return address.slice(0, 5) + '...' + address.slice(-4);
 };
 

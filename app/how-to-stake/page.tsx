@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 export default function HowToStake() {
   return (
-    <main className="relative min-h-screen flex flex-col items-center pt-20 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
+    <main className="relative min-h-[100dvh] flex flex-col items-center pt-20 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
       <div className="fixed inset-0 bg-[#050505] -z-20" />
       <GridTraffic />
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
@@ -48,9 +48,61 @@ export default function HowToStake() {
 
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
                   <h3 className="text-lg font-monorama font-bold text-red-9 mb-2">2. $QUAI Tokens</h3>
-                  <p className="text-zinc-400">
+                  <p className="text-zinc-400 mb-3">
                     You need $QUAI tokens in your wallet to stake. Make sure you have enough $QUAI for staking plus a small amount for gas fees.
                   </p>
+                  <p className="text-zinc-400 mb-3">
+                    Get QUAI from these exchanges:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <a
+                      href="https://www.mexc.com/exchange/QUAI_USDT"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase"
+                      >
+                        MEXC →
+                      </Button>
+                    </a>
+                    <a
+                      href="https://www.gate.io/trade/QUAI_USDT"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase"
+                      >
+                        Gate.io →
+                      </Button>
+                    </a>
+                    <a
+                      href="https://letsexchange.io/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase"
+                      >
+                        LetsExchange →
+                      </Button>
+                    </a>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled
+                      className="bg-zinc-900/50 border border-zinc-700 text-zinc-500 font-monorama uppercase cursor-not-allowed"
+                    >
+                      Kraken (Coming Soon)
+                    </Button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -109,25 +161,34 @@ export default function HowToStake() {
               </div>
             </section>
 
-            {/* Lock & Delay Mechanism */}
+            {/* Withdrawal Mechanism */}
             <section className="space-y-4">
-              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Understanding the Lock & Delay Mechanism</h2>
+              <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Understanding the Withdrawal Process</h2>
               <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-6 space-y-4">
                 <div className="space-y-2">
                   <h3 className="text-lg font-monorama font-bold text-white flex items-center gap-2">
-                    <span className="text-red-9 mr-2">🔒</span> Staking Lock (30 Days)
+                    <span className="text-red-9 mr-2">✅</span> Instant Staking
                   </h3>
                   <p className="text-zinc-400">
-                    When you stake $QUAI, your tokens are locked for 30 days. During this time, you cannot request withdrawals, but you continue to earn rewards.
+                    When you stake $QUAI, your tokens immediately start earning rewards. There is no initial lock period - you can request a withdrawal at any time.
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="text-lg font-monorama font-bold text-white flex items-center gap-2">
-                    <span className="text-red-9 mr-2">⏰</span> Withdrawal Window (After 30 Days)
+                    <span className="text-red-9 mr-2">🔒</span> 30-Day Withdrawal Lock
                   </h3>
                   <p className="text-zinc-400">
-                    After the 30-day lock period, you can request a withdrawal. Your tokens will become available after a short processing period, during which you will cease earning rewards on the withdrawn amount.
+                    When you request a withdrawal, your tokens enter a 30-day lock period. During this time, the withdrawn amount stops earning rewards. After 30 days, you can complete the withdrawal and receive your tokens.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-monorama font-bold text-white flex items-center gap-2">
+                    <span className="text-red-9 mr-2">↩️</span> Cancel Withdrawal
+                  </h3>
+                  <p className="text-zinc-400">
+                    Changed your mind? You can cancel a pending withdrawal at any time during the 30-day lock period. Your tokens will return to active staking and resume earning rewards immediately.
                   </p>
                 </div>
               </div>
@@ -177,7 +238,7 @@ export default function HowToStake() {
 
             {/* CTA */}
             <div className="flex justify-center pt-4">
-              <Link href="#" className="block group/btn">
+              <Link href="/" className="block group/btn">
                   <Button
                       className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
                       style={{

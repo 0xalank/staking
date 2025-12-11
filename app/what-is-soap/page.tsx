@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 export default function WhatIsSOAP() {
   return (
-    <main className="relative min-h-screen flex flex-col items-center pt-20 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
+    <main className="relative min-h-[100dvh] flex flex-col items-center pt-20 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
       <div className="fixed inset-0 bg-[#050505] -z-20" />
       <GridTraffic />
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
@@ -265,23 +265,10 @@ export default function WhatIsSOAP() {
                     <span className="text-sm text-red-300 bg-red-9/30 px-2 py-1 rounded font-monorama uppercase">Highest APR</span>
                   </div>
                   <p className="text-zinc-400 text-sm mb-2">
-                    Time-locked $QUAI staking with commitment periods. Offers the highest rewards but requires long-term commitment.
+                    Time-locked $QUAI staking with commitment periods. Offers the highest rewards for long-term participants.
                   </p>
                   <div className="text-xs text-zinc-500">
-                    • Lock period: 30 days • Full rewards • High commitment
-                  </div>
-                </div>
-
-                <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-monorama font-bold text-green-400">Yield $QUAI Pool</h3>
-                    <span className="text-sm text-green-300 bg-green-900/30 px-2 py-1 rounded font-monorama uppercase">Flexible Yield</span>
-                  </div>
-                  <p className="text-zinc-400 text-sm mb-2">
-                    Standard $QUAI staking without a fixed lock period. Offers competitive rewards with greater flexibility.
-                  </p>
-                  <div className="text-xs text-zinc-500">
-                    • Flexible withdrawal • Competitive rewards • Lower commitment
+                    • Lock period: 30 days
                   </div>
                 </div>
               </div>
@@ -303,7 +290,7 @@ export default function WhatIsSOAP() {
                   <div className="text-2xl mb-2 text-red-400">🔥</div>
                   <h3 className="text-lg font-monorama font-bold text-red-400 mb-2">Deflationary Pressure</h3>
                   <p className="text-zinc-400 text-sm">
-                    Regular token burns reduce supply over time, creating upward price pressure.
+                    Regular token burns reduce supply over time.
                   </p>
                 </div>
 

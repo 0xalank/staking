@@ -139,7 +139,7 @@ export default function Portfolio() {
               <p className="text-zinc-400 mb-6 animate-in fade-in-up duration-700 delay-200">
                 You don&apos;t have any active staking positions yet. Start staking to see your portfolio here.
               </p>
-              <Link href="#" className="block group/btn">
+              <Link href="/" className="block group/btn">
                   <Button
                       className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
                       style={{
@@ -158,7 +158,7 @@ export default function Portfolio() {
   }
 
   return (
-    <main className="relative min-h-screen flex flex-col items-center pt-32 pb-8 px-4 overflow-hidden selection:bg-red-9/30">
+    <main className="relative min-h-[100dvh] flex flex-col items-center pt-24 sm:pt-32 pb-8 px-4 overflow-hidden selection:bg-red-9/30">
       <div className="fixed inset-0 bg-[#050505] -z-20" />
       <GridTraffic />
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
