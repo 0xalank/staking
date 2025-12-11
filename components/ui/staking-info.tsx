@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserStakingInfo, ContractInfo } from '@/lib/hooks/useStaking';
 import { Progress } from '@/components/ui/progress';
 import { formatUnits } from 'quais';
@@ -9,6 +9,7 @@ import { Loader2, ExternalLink, Lock, Clock, Timer, AlertTriangle, CheckCircle }
 import { cn } from '@/lib/utils';
 import { formatQuai } from '@/lib/hooks/useStaking';
 import { SECONDS_PER_BLOCK } from '@/lib/config';
+import { useToast } from '@/hooks/use-toast';
 
 interface StakingInfoProps {
   userInfo: UserStakingInfo | null;
@@ -64,6 +65,19 @@ export function StakingInfo({
   const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw' | 'rewards'>('deposit');
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
+  const { toast } = useToast();
+
+  // Show toast notification when error changes
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Transaction Error',
+        description: error,
+        duration: 3000,
+      });
+    }
+  }, [error, toast]);
   
 
   const handleDeposit = async () => {
@@ -275,12 +289,6 @@ export function StakingInfo({
     <div className="space-y-4">
       <Card className="modern-card overflow-hidden border border-red-9/20">
         <CardContent className="space-y-4">
-          {error && (
-            <div className="p-3 bg-red-9/10 text-red-400 rounded-md text-sm mb-4 border border-red-9/20">
-              <AlertTriangle className="inline-block h-4 w-4 mr-2" /> {error}
-            </div>
-          )}
-
           {transactionHash && (
             <div className="p-3 bg-green-500/10 text-green-400 rounded-md text-sm mb-2 border border-green-9/20">
               <CheckCircle className="inline-block h-4 w-4 mr-2" /> Transaction submitted:{' '}

@@ -82,6 +82,19 @@ export default function HowToStake() {
                       </Button>
                     </a>
                     <a
+                      href="https://www.lbank.com/trade/quai_usdt"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase"
+                      >
+                        LBank →
+                      </Button>
+                    </a>
+                    <a
                       href="https://letsexchange.io/"
                       target="_blank"
                       rel="noopener noreferrer"

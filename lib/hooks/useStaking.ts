@@ -15,6 +15,58 @@ export function formatBalance(value: string | number): string {
   return parseFloat(num.toFixed(3)).toString();
 }
 
+// Helper to parse transaction errors into user-friendly messages
+function parseTransactionError(error: any): string {
+  const errorMessage = error?.message || error?.toString() || '';
+  const errorCode = error?.code;
+
+  // User rejected the transaction
+  if (errorCode === 'ACTION_REJECTED' ||
+      errorCode === 4001 ||
+      errorMessage.includes('user rejected') ||
+      errorMessage.includes('User denied') ||
+      errorMessage.includes('user denied')) {
+    return 'Transaction cancelled';
+  }
+
+  // Insufficient funds
+  if (errorMessage.includes('insufficient funds') || errorMessage.includes('Insufficient balance')) {
+    return 'Insufficient balance for this transaction';
+  }
+
+  // Contract revert errors
+  if (errorMessage.includes('execution reverted')) {
+    // Try to extract the revert reason
+    if (errorMessage.includes('User amount above limit')) {
+      return 'Deposit would exceed pool limit';
+    }
+    if (errorMessage.includes('Insufficient reward balance')) {
+      return 'Contract has insufficient reward funds. Please try again later.';
+    }
+    if (errorMessage.includes('Amount to withdraw too high')) {
+      return 'Withdrawal amount exceeds staked balance';
+    }
+    if (errorMessage.includes('Already have pending withdrawal')) {
+      return 'You already have a pending withdrawal';
+    }
+    if (errorMessage.includes('No pending withdrawal')) {
+      return 'No pending withdrawal to complete or cancel';
+    }
+    if (errorMessage.includes('Withdrawal still locked')) {
+      return 'Withdrawal is still in the lock period';
+    }
+    return 'Transaction failed. Please check your balance and try again.';
+  }
+
+  // Network errors
+  if (errorMessage.includes('network') || errorMessage.includes('timeout')) {
+    return 'Network error. Please check your connection and try again.';
+  }
+
+  // Generic fallback - don't show the full technical error
+  return 'Transaction failed. Please try again.';
+}
+
 
 export interface DelayedReward {
   amount: bigint;
@@ -454,7 +506,7 @@ export function useStaking() {
       await loadStakingInfo();
     } catch (error: any) {
       console.error('Deposit failed:', error);
-      setError(error.message || 'Deposit failed. Please try again.');
+      setError(parseTransactionError(error));
     } finally {
       setIsTransacting(false);
     }
@@ -508,7 +560,7 @@ export function useStaking() {
       await loadStakingInfo();
     } catch (error: any) {
       console.error('Request withdraw failed:', error);
-      setError(error.message || 'Request withdraw failed. Please try again.');
+      setError(parseTransactionError(error));
     } finally {
       setIsTransacting(false);
     }
@@ -550,7 +602,7 @@ export function useStaking() {
       await loadStakingInfo();
     } catch (error: any) {
       console.error('Complete withdraw failed:', error);
-      setError(error.message || 'Complete withdraw failed. Please try again.');
+      setError(parseTransactionError(error));
     } finally {
       setIsTransacting(false);
     }
@@ -592,7 +644,7 @@ export function useStaking() {
       await loadStakingInfo();
     } catch (error: any) {
       console.error('Cancel withdrawal failed:', error);
-      setError(error.message || 'Cancel withdrawal failed. Please try again.');
+      setError(parseTransactionError(error));
     } finally {
       setIsTransacting(false);
     }
@@ -687,7 +739,7 @@ export function useStaking() {
       await loadStakingInfo();
     } catch (error: any) {
       console.error('Claim failed:', error);
-      setError(error.message || 'Claim failed. Please try again.');
+      setError(parseTransactionError(error));
     } finally {
       setIsTransacting(false);
     }
