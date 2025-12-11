@@ -214,6 +214,36 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
   }
 
+  // Compound rewards - claim and restake in one transaction
+  function compound() external nonReentrant {
+    UserInfo storage user = userInfo[msg.sender];
+    require(user.pendingWithdrawal == 0, 'Cannot compound during exit period');
+
+    _updatePool();
+
+    uint256 pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
+    require(pending > 0, 'No rewards to compound');
+
+    // Check solvency
+    uint256 rewardBalance = address(this).balance - totalStaked - totalPendingWithdrawals;
+    require(pending <= rewardBalance, 'Insufficient reward balance');
+
+    // Check pool limit if applicable
+    if (hasUserLimit) {
+      require(user.amount + pending <= poolLimitPerUser, 'User amount above limit');
+    }
+
+    // Add rewards to staked amount (no transfer needed - rewards stay in contract)
+    user.amount = user.amount + pending;
+    totalStaked = totalStaked + pending;
+
+    // Update reward debt
+    user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
+
+    emit RewardClaimed(msg.sender, pending);
+    emit Deposit(msg.sender, pending);
+  }
+
   // Recover wrong tokens sent to the contract (not native tokens)
   function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
     require(_tokenAddress != address(0), 'Cannot recover native tokens');

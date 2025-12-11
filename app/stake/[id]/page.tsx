@@ -252,6 +252,7 @@ export default function StakePage() {
           onExecuteWithdraw={staking.executeWithdraw}
           onCancelWithdraw={staking.cancelWithdraw}
           onClaimRewards={staking.claimRewards}
+          onCompound={staking.compound}
           onRefresh={staking.refreshData}
           stakedSymbol="$QUAI"
           rewardSymbol="$QUAI"

@@ -17,7 +17,7 @@ export default function WhatIsSOAP() {
         <Card className="modern-card border border-red-9/20">
           <CardHeader>
             <CardTitle className="text-3xl font-monorama font-bold text-white drop-shadow-[0_0_10px_rgba(226,41,1,0.2)]">What is SOAP?</CardTitle>
-            <CardDescription className="text-zinc-400">
+            <CardDescription className="text-zinc-200">
               Understanding the Subsidized Open-market Acquisition Protocol - How Quai turns merge-mining into token buybacks
             </CardDescription>
           </CardHeader>
@@ -26,12 +26,12 @@ export default function WhatIsSOAP() {
             <section className="space-y-4">
               <div className="bg-red-9/5 border border-red-9/20 rounded-lg p-6">
                 <h2 className="text-xl font-monorama font-bold text-white mb-4">SOAP Overview</h2>
-                <p className="text-zinc-400 leading-relaxed mb-4">
+                <p className="text-zinc-100 leading-relaxed mb-4">
                   SOAP (Subsidized Open-market Acquisition Protocol) transforms traditional merge-mining into a protocol subsidy mechanism.
                   Instead of miners receiving rewards from multiple chains directly (creating selling pressure), SOAP routes
                   parent chain rewards to protocol-controlled addresses that automatically buy $QUAI tokens.
                 </p>
-                <p className="text-zinc-400 leading-relaxed">
+                <p className="text-zinc-100 leading-relaxed">
                   The purchased $QUAI is then either burned to reduce supply or distributed to time-locked stakers,
                   creating continuous buy pressure while rewarding long-term network participants.
                 </p>
@@ -42,15 +42,15 @@ export default function WhatIsSOAP() {
             <section className="space-y-4">
               <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">The Merge-Mining Innovation</h2>
               <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-6">
-                <p className="text-zinc-400 leading-relaxed mb-4">
+                <p className="text-zinc-100 leading-relaxed mb-4">
                   Traditional merge-mining allows miners to work on multiple blockchains simultaneously without splitting
                   their computational power. Famous examples include Namecoin with Bitcoin, and Dogecoin with Litecoin.
                 </p>
-                <p className="text-zinc-400 leading-relaxed mb-4">
+                <p className="text-zinc-100 leading-relaxed mb-4">
                   <strong className="text-white">The Problem:</strong> In traditional setups, miners receive rewards from both chains directly,
                   often immediately selling the child chain&apos;s tokens, creating ongoing selling pressure.
                 </p>
-                <p className="text-zinc-400 leading-relaxed">
+                <p className="text-zinc-100 leading-relaxed">
                   <strong className="text-white">SOAP&apos;s Solution:</strong> Channel that flow into permanent protocol support by converting
                   external mining rewards into $QUAI buybacks instead of direct miner payouts.
                 </p>
@@ -67,7 +67,7 @@ export default function WhatIsSOAP() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Multi-Chain Mining</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Miners with SHA256d (BCH), Scrypt (LTC/DOGE), or KAWPOW hardware can mine $QUAI while
                       their parent chain rewards are automatically routed to protocol-controlled addresses.
                     </p>
@@ -80,7 +80,7 @@ export default function WhatIsSOAP() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Automatic $QUAI Buybacks</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Parent chain rewards (BCH, LTC, DOGE) are automatically converted to $QUAI at market rates,
                       creating continuous buy pressure instead of selling pressure.
                     </p>
@@ -93,7 +93,7 @@ export default function WhatIsSOAP() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Burn & Reward Distribution</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Purchased $QUAI is either burned to reduce supply or distributed to time-locked stakers,
                       creating sustainable yield without token inflation.
                     </p>
@@ -106,7 +106,7 @@ export default function WhatIsSOAP() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Enhanced Security</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Workshares from different algorithms contribute to block weight and economic finality,
                       making reorg attacks more expensive while diversifying the security model.
                     </p>
@@ -121,44 +121,44 @@ export default function WhatIsSOAP() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
                   <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2 flex items-center gap-2">📋 Workshares</h3>
-                  <p className="text-zinc-400 text-sm mb-2">
+                  <p className="text-zinc-100 mb-2">
                     $QUAI blocks are produced exclusively by KAWPOW miners, but other algorithms
                     (SHA256d, Scrypt) can submit &ldquo;workshares&rdquo; that get included in blocks.
                   </p>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Each workshare proves computational work on parent chains and earns proportional $QUAI rewards.
                   </p>
                 </div>
 
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
                   <h3 className="text-lg font-monorama font-bold text-purple-400 mb-2 flex items-center gap-2">🔗 AuxPoW Proofs</h3>
-                  <p className="text-zinc-400 text-sm mb-2">
+                  <p className="text-zinc-100 mb-2">
                     Auxiliary Proof-of-Work structures verify that parent chain blocks actually
                     paid the protocol address and included required SOAP commitments.
                   </p>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     This ensures trustless verification without requiring changes to existing mining infrastructure.
                   </p>
                 </div>
 
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
                   <h3 className="text-lg font-monorama font-bold text-green-400 mb-2 flex items-center gap-2">⚖️ Multi-Algorithm Security</h3>
-                  <p className="text-zinc-400 text-sm mb-2">
+                  <p className="text-zinc-100 mb-2">
                     Hardware diversity across SHA256d, Scrypt, and KAWPOW ASICs makes it harder
                     for any single manufacturer or hardware class to dominate.
                   </p>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Each algorithm contributes to block weight, making reorgs proportionally more expensive.
                   </p>
                 </div>
 
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
                   <h3 className="text-lg font-monorama font-bold text-orange-400 mb-2 flex items-center gap-2">🎛️ Graceful Degradation</h3>
-                  <p className="text-zinc-400 text-sm mb-2">
+                  <p className="text-zinc-100 mb-2">
                     SOAP is designed to fail gracefully. If parent chain participation drops to zero,
                     $QUAI continues producing KAWPOW blocks normally.
                   </p>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     There&apos;s no liveness coupling - workshares are purely additive benefits.
                   </p>
                 </div>
@@ -173,7 +173,7 @@ export default function WhatIsSOAP() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <h4 className="text-md font-monorama font-bold text-green-400 mb-2">Parent Chain Miners (BCH/LTC/DOGE)</h4>
-                    <ul className="text-zinc-400 text-sm space-y-1">
+                    <ul className="text-zinc-100 space-y-1">
                       <li>• Receive $QUAI rewards for workshare submissions</li>
                       <li>• Diversify earnings across multiple tokens</li>
                       <li>• Contribute to Quai security while mining parent chains</li>
@@ -182,7 +182,7 @@ export default function WhatIsSOAP() {
                   </div>
                   <div>
                     <h4 className="text-md font-monorama font-bold text-blue-400 mb-2">KAWPOW Miners</h4>
-                    <ul className="text-zinc-400 text-sm space-y-1">
+                    <ul className="text-zinc-100 space-y-1">
                       <li>• Receive standard $QUAI block rewards</li>
                       <li>• Benefit from SOAP buyback pressure on $QUAI price</li>
                       <li>• Secure Quai directly using KAWPOW algorithm</li>
@@ -194,15 +194,15 @@ export default function WhatIsSOAP() {
 
               <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-6">
                 <h3 className="text-lg font-monorama font-bold text-white mb-3">Market Dynamics</h3>
-                <p className="text-zinc-400 text-sm mb-3">
+                <p className="text-zinc-100 mb-3">
                   <strong className="text-white">$Best Case:</strong> Non-mercenary miners hold their $QUAI rewards while parent chain
                   subsidies create continuous buy pressure, leading to net positive price action.
                 </p>
-                <p className="text-zinc-400 text-sm mb-3">
+                <p className="text-zinc-100 mb-3">
                   <strong className="text-white">$Worst Case:</strong> Miners immediately sell $QUAI while protocol buys with subsidies,
                   creating net-zero flow but maintaining price stability.
                 </p>
-                <p className="text-zinc-400 text-sm">
+                <p className="text-zinc-100">
                   <strong className="text-white">Feedback Loop:</strong> Higher $QUAI prices → More hashrate → Stronger security →
                   More attractive to parent chains → More subsidy flows → More buybacks.
                 </p>
@@ -217,7 +217,7 @@ export default function WhatIsSOAP() {
                   <h3 className="text-lg font-monorama font-bold text-red-400 mb-2 flex items-center gap-2">
                     🔥 Deflationary Mechanism
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Parent chain subsidies fund $QUAI burns, reducing total supply while external miners provide security
                     without requiring $QUAI emission increases.
                   </p>
@@ -227,7 +227,7 @@ export default function WhatIsSOAP() {
                   <h3 className="text-lg font-monorama font-bold text-green-400 mb-2 flex items-center gap-2">
                     💰 Sustainable Rewards
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Staking rewards come from external protocol subsidies rather than inflation,
                     creating sustainable yield backed by real economic activity.
                   </p>
@@ -237,7 +237,7 @@ export default function WhatIsSOAP() {
                   <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2 flex items-center gap-2">
                     🛡️ Enhanced Security
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Multi-algorithm workshares increase block weight and reorg costs while diversifying
                     security across different hardware supply chains.
                   </p>
@@ -247,7 +247,7 @@ export default function WhatIsSOAP() {
                   <h3 className="text-lg font-monorama font-bold text-purple-400 mb-2 flex items-center gap-2">
                     📊 Inverted Economics
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Unlike traditional merge-mining that creates selling pressure, SOAP converts
                     external mining into permanent buy pressure and protocol support.
                   </p>
@@ -264,7 +264,7 @@ export default function WhatIsSOAP() {
                     <h3 className="text-lg font-monorama font-bold text-red-400">Locked $QUAI Pool</h3>
                     <span className="text-sm text-red-300 bg-red-9/30 px-2 py-1 rounded font-monorama uppercase">Highest APR</span>
                   </div>
-                  <p className="text-zinc-400 text-sm mb-2">
+                  <p className="text-zinc-100 mb-2">
                     Time-locked $QUAI staking with commitment periods. Offers the highest rewards for long-term participants.
                   </p>
                   <div className="text-xs text-zinc-500">
@@ -281,7 +281,7 @@ export default function WhatIsSOAP() {
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4 text-center">
                   <div className="text-2xl mb-2 text-blue-400">📈</div>
                   <h3 className="text-lg font-monorama font-bold text-blue-400 mb-2">Sustainable Yield</h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Protocol-backed rewards create sustainable yield without relying on token inflation.
                   </p>
                 </div>
@@ -289,7 +289,7 @@ export default function WhatIsSOAP() {
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4 text-center">
                   <div className="text-2xl mb-2 text-red-400">🔥</div>
                   <h3 className="text-lg font-monorama font-bold text-red-400 mb-2">Deflationary Pressure</h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Regular token burns reduce supply over time.
                   </p>
                 </div>
@@ -297,7 +297,7 @@ export default function WhatIsSOAP() {
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4 text-center">
                   <div className="text-2xl mb-2 text-green-400">🎯</div>
                   <h3 className="text-lg font-monorama font-bold text-green-400 mb-2">Aligned Incentives</h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Rewards long-term holders and active participants in the ecosystem.
                   </p>
                 </div>
@@ -307,7 +307,7 @@ export default function WhatIsSOAP() {
             {/* CTA */}
             <div className="bg-red-9/5 border border-red-9/20 rounded-lg p-6 text-center">
               <h3 className="text-xl font-monorama font-bold text-white mb-2">Ready to Join SOAP?</h3>
-              <p className="text-zinc-400 mb-4">
+              <p className="text-zinc-100 mb-4">
                 Start earning sustainable rewards through the SOAP protocol today.
               </p>
               <div className="flex gap-4 justify-center">
@@ -325,7 +325,7 @@ export default function WhatIsSOAP() {
                 <Link href="/calculator" className="block group/btn">
                   <Button 
                     variant="outline" 
-                    className="h-12 bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase px-8"
+                    className="h-12 bg-zinc-900/50 border border-zinc-700 text-zinc-100 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase px-8"
                   >
                     Use Calculator
                   </Button>

@@ -24,6 +24,7 @@ interface StakingInfoProps {
   onExecuteWithdraw: () => Promise<void>;
   onCancelWithdraw: () => Promise<void>;
   onClaimRewards: () => Promise<void>;
+  onCompound?: () => Promise<void>;
   onRefresh: () => void;
   stakedSymbol?: string;
   rewardSymbol?: string;
@@ -44,6 +45,7 @@ export function StakingInfo({
   onExecuteWithdraw,
   onCancelWithdraw,
   onClaimRewards,
+  onCompound,
   onRefresh,
   stakedSymbol = '$QUAI',
   rewardSymbol = '$QUAI',
@@ -65,7 +67,15 @@ export function StakingInfo({
   const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw' | 'rewards'>('deposit');
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [activeAction, setActiveAction] = useState<'deposit' | 'withdraw' | 'execute' | 'cancel' | 'claim' | 'compound' | null>(null);
   const { toast } = useToast();
+
+  // Reset activeAction when transaction completes
+  useEffect(() => {
+    if (!isTransacting) {
+      setActiveAction(null);
+    }
+  }, [isTransacting]);
 
   // Show toast notification when error changes
   useEffect(() => {
@@ -78,10 +88,31 @@ export function StakingInfo({
       });
     }
   }, [error, toast]);
-  
+
+  // Show toast notification when transaction is submitted
+  useEffect(() => {
+    if (transactionHash) {
+      toast({
+        title: 'Transaction Submitted',
+        description: (
+          <a
+            href={`https://quaiscan.io/tx/${transactionHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-red-400 flex items-center gap-1"
+          >
+            View on Explorer →
+          </a>
+        ),
+        duration: 5000,
+      });
+    }
+  }, [transactionHash, toast]);
+
 
   const handleDeposit = async () => {
     if (!depositAmount || parseFloat(depositAmount) <= 0) return;
+    setActiveAction('deposit');
     const raw = depositAmount.replace(/,/g, '');
     await onDeposit(raw, 0); // No duration needed for simple staking
     setDepositAmount('');
@@ -89,17 +120,32 @@ export function StakingInfo({
 
   const handleRequestWithdraw = async () => {
     if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) return;
+    setActiveAction('withdraw');
     const raw = withdrawAmount.replace(/,/g, '');
     await onRequestWithdraw(raw);
     setWithdrawAmount('');
   };
 
   const handleExecuteWithdraw = async () => {
+    setActiveAction('execute');
     await onExecuteWithdraw();
   };
 
   const handleCancelWithdraw = async () => {
+    setActiveAction('cancel');
     await onCancelWithdraw();
+  };
+
+  const handleClaimRewards = async () => {
+    setActiveAction('claim');
+    await onClaimRewards();
+  };
+
+  const handleCompound = async () => {
+    setActiveAction('compound');
+    if (onCompound) {
+      await onCompound();
+    }
   };
 
   const formatTimeRemaining = (seconds: number) => {
@@ -157,28 +203,60 @@ export function StakingInfo({
         {/* Show claimable rewards and claim button */}
         {hasClaimableRewards ? (
           <>
-            <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-300 font-monorama">Claimable Rewards</span>
-                <span className="text-green-400 font-monorama font-bold text-lg">
+            <div className="p-4 bg-gradient-to-r from-red-950/20 to-orange-950/20 border border-red-500/30 rounded-lg relative overflow-hidden">
+              <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
+              <div className="flex justify-between items-center relative z-10">
+                <span className="text-zinc-300 font-monorama uppercase tracking-wider text-sm">Claimable Rewards</span>
+                <span className="font-monorama font-bold text-xl bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
                   {withCommas(userInfo.claimableRewardsFormatted)} {rewardSymbol}
                 </span>
               </div>
             </div>
-            <Button
-              onClick={onClaimRewards}
-              disabled={isTransacting}
-              className="w-full bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase transition-colors"
-            >
-              {isTransacting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                `Claim ${withCommas(userInfo.claimableRewardsFormatted)} ${rewardSymbol}`
+            <div className="flex gap-2">
+              <Button
+                onClick={handleClaimRewards}
+                disabled={isTransacting}
+                className="flex-1 h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-colors clip-button group"
+                style={{
+                  clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                }}
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
+                {activeAction === 'claim' && isTransacting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Claim'
+                )}
+              </Button>
+              {onCompound && (
+                <Button
+                  onClick={handleCompound}
+                  disabled={isTransacting || userInfo?.isInExitPeriod}
+                  className="flex-1 h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-colors clip-button group"
+                  style={{
+                    clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                  }}
+                >
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
+                  {activeAction === 'compound' && isTransacting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Compound'
+                  )}
+                </Button>
               )}
-            </Button>
+            </div>
+            {userInfo?.isInExitPeriod && onCompound && (
+              <p className="text-xs text-zinc-500 text-center mt-2">
+                Compound unavailable during exit period
+              </p>
+            )}
           </>
         ) : (
           <div className="text-center py-4">
@@ -249,9 +327,13 @@ export function StakingInfo({
             <Button
               onClick={handleExecuteWithdraw}
               disabled={isTransacting}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold tracking-widest uppercase"
+              className="flex-1 h-14 bg-green-600 hover:bg-green-700 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-colors clip-button group"
+              style={{
+                clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+              }}
             >
-              {isTransacting ? (
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
+              {activeAction === 'execute' && isTransacting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
@@ -268,10 +350,14 @@ export function StakingInfo({
             variant="outline"
             className={cn(
               userInfo.canExecuteWithdraw ? "flex-1" : "w-full",
-              "border-red-400 text-red-400 hover:bg-red-400/10 hover:text-red-300 font-bold tracking-widest uppercase"
+              "h-14 bg-transparent border-red-400 text-red-400 hover:bg-red-400/10 hover:text-red-300 font-bold tracking-widest uppercase relative overflow-hidden transition-all clip-button group"
             )}
+            style={{
+              clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+            }}
           >
-            {isTransacting ? (
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
+            {activeAction === 'cancel' && isTransacting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Processing...
@@ -289,21 +375,6 @@ export function StakingInfo({
     <div className="space-y-4">
       <Card className="modern-card overflow-hidden border border-red-9/20">
         <CardContent className="space-y-4">
-          {transactionHash && (
-            <div className="p-3 bg-green-500/10 text-green-400 rounded-md text-sm mb-2 border border-green-9/20">
-              <CheckCircle className="inline-block h-4 w-4 mr-2" /> Transaction submitted:{' '}
-              <a
-                href={`https://quaiscan.io/tx/${transactionHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-red-400"
-              >
-                View on Explorer <ExternalLink className="inline h-3 w-3" />
-              </a>
-            </div>
-          )}
-
-
           {/* User Staking Info */}
           {userInfo && userInfo.stakedAmount > BigInt(0) && (
             <div className="space-y-2 font-monorama p-4">
@@ -361,18 +432,6 @@ export function StakingInfo({
               </Button>
               <Button
                 variant="ghost"
-                onClick={() => setActiveTab('withdraw')}
-                className={cn(
-                  'flex-1 font-monorama uppercase text-sm',
-                  activeTab === 'withdraw'
-                    ? 'bg-red-9 text-white shadow-md shadow-red-9/30'
-                    : 'text-zinc-400 hover:bg-zinc-800'
-                )}
-              >
-                Withdraw
-              </Button>
-              <Button
-                variant="ghost"
                 onClick={() => setActiveTab('rewards')}
                 className={cn(
                   'flex-1 font-monorama uppercase text-sm',
@@ -382,6 +441,18 @@ export function StakingInfo({
                 )}
               >
                 Rewards
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setActiveTab('withdraw')}
+                className={cn(
+                  'flex-1 font-monorama uppercase text-sm',
+                  activeTab === 'withdraw'
+                    ? 'bg-red-9 text-white shadow-md shadow-red-9/30'
+                    : 'text-zinc-400 hover:bg-zinc-800'
+                )}
+              >
+                Withdraw
               </Button>
             </div>
 
@@ -453,9 +524,13 @@ export function StakingInfo({
                     parseFloat(depositAmount) <= 0 ||
                     userInfo?.isInExitPeriod
                   }
-                  className="w-full bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase transition-colors"
+                  className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-all clip-button group"
+                  style={{
+                    clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                  }}
                 >
-                  {isTransacting ? (
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
+                  {activeAction === 'deposit' && isTransacting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Processing...
@@ -476,7 +551,7 @@ export function StakingInfo({
               <div className="space-y-4">
                 <div className="p-3 bg-red-9/10 text-red-400 rounded-lg text-xs border border-red-9/20 font-monorama">
                   <p className="font-medium mb-1">Withdrawal Lock Period:</p>
-                  <p>Withdrawals require a 30-day lock period. During this period, rewards continue to accrue on your remaining staked amount.</p>
+                  <p>Withdrawals require a 30-day lock period. During this period, rewards DO NOT accrue on the withdrawal amount. Rewards continue to accrue on your remaining staked amount.</p>
                 </div>
                 <WithdrawalStatusDisplay />
 
@@ -510,13 +585,17 @@ export function StakingInfo({
                         !userInfo?.canRequestWithdraw
                       }
                       className={cn(
-                        'w-full bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase transition-colors',
+                        'w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-all clip-button group',
                         !userInfo?.canRequestWithdraw
                           ? 'opacity-50 cursor-not-allowed'
                           : ''
                       )}
+                      style={{
+                        clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                      }}
                     >
-                      {isTransacting ? (
+                      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover:animate-[shine_1s_infinite]" />
+                      {activeAction === 'withdraw' && isTransacting ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Processing...

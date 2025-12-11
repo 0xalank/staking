@@ -745,6 +745,41 @@ export function useStaking() {
     }
   }, [account, web3Provider, userInfo, loadStakingInfo]);
 
+  // Compound rewards (claim + restake in one transaction)
+  const compound = useCallback(async () => {
+    if (!account?.addr || !web3Provider) {
+      setError('Please connect your wallet');
+      return;
+    }
+
+    if (!userInfo || userInfo.claimableRewards <= BigInt(0)) {
+      setError('No rewards to compound');
+      return;
+    }
+
+    setIsTransacting(true);
+    setError(null);
+    setTransactionHash(null);
+
+    try {
+      const signer = await web3Provider.getSigner();
+      const stakingContract = new Contract(STAKING_CONTRACT_ADDRESS, SmartChefNativeABI, signer);
+
+      // Single transaction compound
+      const tx = await stakingContract.compound({ gasLimit: 500000 });
+      setTransactionHash(tx.hash);
+      await tx.wait();
+
+      // Reload staking info
+      await loadStakingInfo();
+    } catch (error: any) {
+      console.error('Compound failed:', error);
+      setError(parseTransactionError(error));
+    } finally {
+      setIsTransacting(false);
+    }
+  }, [account, web3Provider, userInfo, loadStakingInfo]);
+
   // Note: Emergency withdraw has been removed from the new contract
 
   // Refresh rewards periodically: update pending rewards (simple - no vesting)
@@ -807,6 +842,7 @@ export function useStaking() {
     executeWithdraw,
     cancelWithdraw,
     claimRewards,
+    compound,
     refreshData,
     refreshRewards,
   };

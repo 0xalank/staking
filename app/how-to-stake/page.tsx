@@ -17,7 +17,7 @@ export default function HowToStake() {
         <Card className="modern-card border border-red-9/20">
           <CardHeader>
             <CardTitle className="text-3xl font-monorama font-bold text-white drop-shadow-[0_0_10px_rgba(226,41,1,0.2)]">How to Stake $QUAI</CardTitle>
-            <CardDescription className="text-zinc-400">
+            <CardDescription className="text-zinc-300">
               Learn how to stake your $QUAI tokens and earn rewards
             </CardDescription>
           </CardHeader>
@@ -28,7 +28,7 @@ export default function HowToStake() {
               <div className="space-y-3">
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
                   <h3 className="text-lg font-monorama font-bold text-red-9 mb-2">1. Pelagus Wallet</h3>
-                  <p className="text-zinc-400 mb-2">
+                  <p className="text-zinc-100 mb-2">
                     You need to have Pelagus wallet installed in your browser to interact with the Quai Network.
                   </p>
                   <a
@@ -48,10 +48,10 @@ export default function HowToStake() {
 
                 <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-4">
                   <h3 className="text-lg font-monorama font-bold text-red-9 mb-2">2. $QUAI Tokens</h3>
-                  <p className="text-zinc-400 mb-3">
+                  <p className="text-zinc-100 mb-3">
                     You need $QUAI tokens in your wallet to stake. Make sure you have enough $QUAI for staking plus a small amount for gas fees.
                   </p>
-                  <p className="text-zinc-400 mb-3">
+                  <p className="text-zinc-100 mb-3">
                     Get QUAI from these exchanges:
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -130,7 +130,7 @@ export default function HowToStake() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Connect Your Wallet</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Click the &ldquo;Connect&rdquo; button in the header to connect your Pelagus wallet. Make sure you&apos;re on the Cyprus-1 network.
                     </p>
                   </div>
@@ -142,7 +142,7 @@ export default function HowToStake() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Enter Staking Amount</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Navigate to the Stake tab and enter the amount of $QUAI you want to stake. The interface will show you the current APY and your expected rewards.
                     </p>
                   </div>
@@ -154,7 +154,7 @@ export default function HowToStake() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Confirm Transaction</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Click &ldquo;Deposit&rdquo; and confirm the transaction in your Pelagus wallet. Your tokens will be staked after the transaction is confirmed.
                     </p>
                   </div>
@@ -166,7 +166,7 @@ export default function HowToStake() {
                   </div>
                   <div className="flex-1 space-y-2">
                     <h3 className="text-lg font-monorama font-bold text-white">Earn Rewards</h3>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-100">
                       Your staked $QUAI will start earning rewards immediately. You can claim your rewards at any time without unstaking your principal.
                     </p>
                   </div>
@@ -182,7 +182,7 @@ export default function HowToStake() {
                   <h3 className="text-lg font-monorama font-bold text-white flex items-center gap-2">
                     <span className="text-red-9 mr-2">✅</span> Instant Staking
                   </h3>
-                  <p className="text-zinc-400">
+                  <p className="text-zinc-100">
                     When you stake $QUAI, your tokens immediately start earning rewards. There is no initial lock period - you can request a withdrawal at any time.
                   </p>
                 </div>
@@ -191,7 +191,7 @@ export default function HowToStake() {
                   <h3 className="text-lg font-monorama font-bold text-white flex items-center gap-2">
                     <span className="text-red-9 mr-2">🔒</span> 30-Day Withdrawal Lock
                   </h3>
-                  <p className="text-zinc-400">
+                  <p className="text-zinc-100">
                     When you request a withdrawal, your tokens enter a 30-day lock period. During this time, the withdrawn amount stops earning rewards. After 30 days, you can complete the withdrawal and receive your tokens.
                   </p>
                 </div>
@@ -200,7 +200,7 @@ export default function HowToStake() {
                   <h3 className="text-lg font-monorama font-bold text-white flex items-center gap-2">
                     <span className="text-red-9 mr-2">↩️</span> Cancel Withdrawal
                   </h3>
-                  <p className="text-zinc-400">
+                  <p className="text-zinc-100">
                     Changed your mind? You can cancel a pending withdrawal at any time during the 30-day lock period. Your tokens will return to active staking and resume earning rewards immediately.
                   </p>
                 </div>
@@ -215,7 +215,7 @@ export default function HowToStake() {
                   <h3 className="text-lg font-monorama font-bold text-red-400 mb-2 flex items-center gap-2">
                     💡 Maximize Rewards
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Stake for longer periods to maximize your rewards. The lock mechanism ensures committed stakers earn the best returns.
                   </p>
                 </div>
@@ -224,7 +224,7 @@ export default function HowToStake() {
                   <h3 className="text-lg font-monorama font-bold text-orange-400 mb-2 flex items-center gap-2">
                     ⚡ Gas Optimization
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Batch your transactions when possible. Claiming rewards and re-staking in one session saves on gas fees.
                   </p>
                 </div>
@@ -233,7 +233,7 @@ export default function HowToStake() {
                   <h3 className="text-lg font-monorama font-bold text-yellow-400 mb-2 flex items-center gap-2">
                     📊 Monitor APY
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Keep an eye on the APY as it can change based on the total staked amount and reward distribution.
                   </p>
                 </div>
@@ -242,7 +242,7 @@ export default function HowToStake() {
                   <h3 className="text-lg font-monorama font-bold text-green-400 mb-2 flex items-center gap-2">
                     🔄 Auto-Compound
                   </h3>
-                  <p className="text-zinc-400 text-sm">
+                  <p className="text-zinc-100">
                     Consider claiming and re-staking your rewards periodically to benefit from compound interest.
                   </p>
                 </div>
