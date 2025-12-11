@@ -174,7 +174,7 @@ export function StakingInfo({
         )}
 
         {/* Show delayed/vesting rewards if any exist (legacy support) */}
-        {hasDelayedRewards && (
+        {hasDelayedRewards && userInfo?.delayedRewards && (
           <div className="mt-4 pt-4 border-t border-red-9/10">
             <h4 className="font-monorama font-medium text-white mb-3">Vesting Rewards</h4>
             {userInfo.delayedRewards.map((reward, index) => (
