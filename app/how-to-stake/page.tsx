@@ -65,7 +65,7 @@ export default function HowToStake() {
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
       <div className="w-full max-w-5xl mx-auto space-y-12 relative z-10 animate-in fade-in-up duration-700">
-        
+
         {/* Header Section */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-monorama font-bold text-white drop-shadow-[0_0_10px_rgba(226,41,1,0.2)]">How to Stake $QUAI</h1>
@@ -95,8 +95,8 @@ export default function HowToStake() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full bg-zinc-900 border-zinc-700 text-zinc-300 hover:bg-red-9/20 hover:border-red-9/50 hover:text-white font-monorama uppercase transition-all"
                   >
                     Install Pelagus Wallet
@@ -150,13 +150,13 @@ export default function HowToStake() {
           <div className="relative">
             {/* Connecting Line */}
             <div className="absolute left-[27px] top-8 bottom-8 w-0.5 bg-gradient-to-b from-red-9/50 via-red-9/20 to-transparent hidden md:block" />
-            
+
             <div className="space-y-8">
               {[
-                { title: "Connect Wallet", desc: "Click the 'Connect' button in the header to link your Pelagus wallet. Ensure you're on the Cyprus-1 network." },
+                { title: "Connect Wallet", desc: "Click the 'Connect' button in the header to link your Pelagus wallet." },
                 { title: "Enter Amount", desc: "Navigate to the Stake tab and input the amount of $QUAI you wish to stake. Review the APY and rewards." },
                 { title: "Confirm Transaction", desc: "Click 'Deposit' and approve the transaction in your wallet. Your tokens will be staked upon confirmation." },
-                { title: "Earn Rewards", desc: "Your staked $QUAI starts earning rewards immediately. Claim them anytime without unstaking." }
+                { title: "Earn Rewards", desc: "Your staked $QUAI starts earning rewards immediately. Claim or compound them anytime without unstaking." }
               ].map((step, index) => (
                 <div key={index} className="relative flex gap-6 group">
                   <div className="flex-shrink-0 w-14 h-14 rounded-full bg-zinc-900 border border-red-9/30 flex items-center justify-center relative z-10 group-hover:border-red-9/80 transition-colors shadow-[0_0_15px_-5px_rgba(226,41,1,0.2)]">
@@ -183,7 +183,7 @@ export default function HowToStake() {
                 Tokens start earning immediately upon deposit. No initial lock-up period required.
               </p>
             </div>
-            
+
             <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-6 hover:border-red-9/30 transition-all group">
               <Lock className="w-8 h-8 text-red-9 mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="text-lg font-monorama font-bold text-white mb-2">30-Day Lock</h3>
@@ -208,9 +208,8 @@ export default function HowToStake() {
           <div className="grid md:grid-cols-2 gap-4">
             {[
               { icon: <Lightbulb className="w-5 h-5" />, title: "Maximize Rewards", desc: "Long-term staking maximizes yield capture from protocol subsidies." },
-              { icon: <Zap className="w-5 h-5" />, title: "Gas Optimization", desc: "Batch your claim and compound transactions to save on network fees." },
               { icon: <BarChart className="w-5 h-5" />, title: "Monitor APY", desc: "APY is dynamic based on total network stake and buyback volume." },
-              { icon: <RefreshCw className="w-5 h-5" />, title: "Auto-Compound", desc: "Re-stake rewards periodically to benefit from compound interest effects." }
+              { icon: <RefreshCw className="w-5 h-5" />, title: "Compound", desc: "Re-stake rewards periodically to benefit from compound interest effects." }
             ].map((tip, i) => (
               <div key={i} className="flex gap-4 p-4 bg-zinc-900/30 border border-white/5 rounded-xl hover:bg-zinc-900/50 hover:border-red-9/20 transition-all items-start">
                 <div className="p-2 bg-red-9/10 rounded-lg text-red-9 mt-1">
@@ -237,7 +236,7 @@ export default function HowToStake() {
               {isCopied ? <Check className="h-5 w-5 text-green-500" /> : <LinkIcon className="h-5 w-5" />}
             </button>
           </div>
-          
+
           <div className="bg-zinc-900/30 border border-white/5 rounded-xl overflow-hidden">
             <Accordion type="single" collapsible className="w-full">
               {faqItems.map((item, index) => (
