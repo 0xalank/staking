@@ -3,211 +3,46 @@ import React, { useContext, useRef, useEffect } from 'react';
 import { StateContext, DispatchContext } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Coins, TrendingUp, ExternalLink, ArrowRight, Gift, Loader2 } from 'lucide-react';
+import { Coins, TrendingUp, ExternalLink, ArrowRight, Gift, Loader2, Lock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useStaking } from '@/lib/hooks/useStaking';
 import { formatBalance } from '@/lib/utils/formatBalance';
 import { requestAccounts } from '@/lib/wallet';
+import { cn } from '@/lib/utils';
+import { GridTraffic } from '../page'; // Assuming GridTraffic is exported from homepage
 
 // Connect Wallet Button with particle effects
 const ConnectWalletButton = () => {
   const dispatch = useContext(DispatchContext);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const particlesRef = useRef<Array<{
-    id: number;
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    targetX: number;
-    targetY: number;
-    size: string;
-    element: HTMLDivElement;
-  }>>([]);
-  const animationRef = useRef<number>();
-  const isHovered = useRef(false);
-  const mousePos = useRef({ x: 0, y: 0 });
-  const prevMousePos = useRef({ x: 0, y: 0 });
-  const isMouseMoving = useRef(false);
-  const mouseTimeoutRef = useRef<NodeJS.Timeout>();
-
-  useEffect(() => {
-    const button = buttonRef.current;
-    const canvas = canvasRef.current;
-    if (!button || !canvas) return;
-
-    // Pre-load particles
-    const initializeParticles = () => {
-      const rect = button.getBoundingClientRect();
-      const particleCount = 12;
-
-      for (let i = 0; i < particleCount; i++) {
-        const sizes = ['size-small', 'size-medium', 'size-large'];
-        const size = sizes[Math.floor(Math.random() * sizes.length)];
-
-        const particle = document.createElement('div');
-        particle.className = `particle ${size}`;
-        particle.style.opacity = '0';
-
-        const padding = 15;
-        const x = padding + Math.random() * (rect.width - padding * 2);
-        const y = padding + Math.random() * (rect.height - padding * 2);
-
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-
-        canvas.appendChild(particle);
-
-        const particleData = {
-          id: i,
-          x,
-          y,
-          vx: 0,
-          vy: 0,
-          targetX: x,
-          targetY: y,
-          size,
-          element: particle
-        };
-
-        particlesRef.current.push(particleData);
-      }
-    };
-
-    const updateParticles = () => {
-      const rect = button.getBoundingClientRect();
-
-      particlesRef.current.forEach((particle, index) => {
-        const isPreLoaded = particle.id < 20;
-
-        if (isPreLoaded && isHovered.current) {
-          const dx = mousePos.current.x - particle.x;
-          const dy = mousePos.current.y - particle.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          const lag = 0.015 + (index * 0.008);
-          const followDistance = 25 + (index * 6);
-
-          if (isMouseMoving.current || distance > followDistance) {
-            particle.vx += dx * lag;
-            particle.vy += dy * lag;
-
-            if (isMouseMoving.current) {
-              particle.vx += (Math.random() - 0.5) * 0.6;
-              particle.vy += (Math.random() - 0.5) * 0.6;
-            }
-          }
-
-          const friction = isMouseMoving.current ? 0.90 : 0.85;
-          particle.vx *= friction;
-          particle.vy *= friction;
-        }
-
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-
-        // Boundary collision
-        if (particle.x <= 0 || particle.x >= rect.width - 8) {
-          particle.vx *= -0.8;
-          particle.x = Math.max(0, Math.min(rect.width - 8, particle.x));
-        }
-        if (particle.y <= 0 || particle.y >= rect.height - 8) {
-          particle.vy *= -0.8;
-          particle.y = Math.max(0, Math.min(rect.height - 8, particle.y));
-        }
-
-        particle.element.style.left = `${particle.x}px`;
-        particle.element.style.top = `${particle.y}px`;
-      });
-
-      if (isHovered.current) {
-        animationRef.current = requestAnimationFrame(updateParticles);
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = button.getBoundingClientRect();
-      prevMousePos.current = { ...mousePos.current };
-      mousePos.current.x = e.clientX - rect.left;
-      mousePos.current.y = e.clientY - rect.top;
-
-      const dx = mousePos.current.x - prevMousePos.current.x;
-      const dy = mousePos.current.y - prevMousePos.current.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      isMouseMoving.current = distance > 1;
-
-      if (mouseTimeoutRef.current) {
-        clearTimeout(mouseTimeoutRef.current);
-      }
-      mouseTimeoutRef.current = setTimeout(() => {
-        isMouseMoving.current = false;
-      }, 100);
-    };
-
-    const handleMouseEnter = () => {
-      isHovered.current = true;
-      particlesRef.current.forEach(particle => {
-        if (particle.id < 20) {
-          particle.element.style.opacity = '1';
-        }
-      });
-      updateParticles();
-    };
-
-    const handleMouseLeave = () => {
-      isHovered.current = false;
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      particlesRef.current.forEach(particle => {
-        if (particle.id < 20) {
-          particle.element.style.opacity = '0';
-        }
-      });
-    };
-
-    initializeParticles();
-    button.addEventListener('mousemove', handleMouseMove);
-    button.addEventListener('mouseenter', handleMouseEnter);
-    button.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      button.removeEventListener('mousemove', handleMouseMove);
-      button.removeEventListener('mouseenter', handleMouseEnter);
-      button.removeEventListener('mouseleave', handleMouseLeave);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, []);
 
   return (
-    <div className="rotating-border-wrapper">
-      <Button
-        ref={buttonRef}
-        onClick={() => requestAccounts(dispatch)}
-        className="w-full h-16 bg-transparent hover:bg-black/30 text-white font-medium rounded border-0 particle-button px-8"
-      >
-        <div ref={canvasRef} className="particle-canvas"></div>
-        Connect Wallet
-      </Button>
-    </div>
+    <Link href="#" className="block group/btn">
+        <Button
+            onClick={() => requestAccounts(dispatch)}
+            className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
+            style={{
+                clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+            }}
+        >
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
+            Connect Wallet
+        </Button>
+    </Link>
   );
 };
 
 // Token Logo Component
 const TokenLogo = ({ size = 24 }: { size?: number }) => {
   return (
-    <div className="flex items-center">
+    <div className="relative flex items-center justify-center">
+      <div className="absolute inset-0 bg-red-9/20 rounded-full blur-md" />
       <Image
         src="/images/quai-logo.png"
         alt="QUAI"
         width={size}
         height={size}
-        className="rounded-full"
+        className="rounded-full relative z-10"
       />
     </div>
   );
@@ -245,14 +80,18 @@ export default function Portfolio() {
 
   if (!account?.addr) {
     return (
-      <main className="flex min-h-screen flex-col items-center pt-32 pb-8 px-4">
-        <div className="w-full max-w-4xl mx-auto">
-          <Card className="modern-card">
-            <CardContent className="p-12 text-center">
-              <Coins className="h-16 w-16 text-[#666666] mx-auto mb-4" />
-              <h1 className="text-2xl font-bold text-white mb-2">Portfolio</h1>
-              <p className="text-[#999999] mb-6">
-                Connect your wallet to view your staking positions and earnings
+      <main className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
+        <div className="fixed inset-0 bg-[#050505] -z-20" />
+        <GridTraffic />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
+
+        <div className="w-full max-w-lg mx-auto relative z-10">
+          <Card className="modern-card p-8">
+            <CardContent className="text-center">
+              <Coins className="h-16 w-16 text-red-9/50 mx-auto mb-4 animate-in zoom-in-50 duration-500" />
+              <h1 className="text-3xl font-monorama font-bold text-white mb-2 animate-in fade-in-up duration-700 delay-100">Portfolio Access</h1>
+              <p className="text-zinc-400 mb-6 animate-in fade-in-up duration-700 delay-200">
+                Connect your wallet to view your staking positions and earnings.
               </p>
               <ConnectWalletButton />
             </CardContent>
@@ -265,15 +104,17 @@ export default function Portfolio() {
   // Show loading state while staking data is loading
   if (staking.isLoading) {
     return (
-      <main className="flex min-h-screen flex-col items-center pt-32 pb-8 px-4">
-        <div className="w-full max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-white mb-8">Your Portfolio</h1>
+      <main className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
+        <div className="fixed inset-0 bg-[#050505] -z-20" />
+        <GridTraffic />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
-          <Card className="modern-card">
-            <CardContent className="p-12 text-center">
-              <Loader2 className="h-16 w-16 text-red-600 mx-auto mb-4 animate-spin" />
-              <h2 className="text-xl font-bold text-white mb-2">Loading Portfolio</h2>
-              <p className="text-[#999999]">
+        <div className="w-full max-w-lg mx-auto relative z-10">
+          <Card className="modern-card p-8">
+            <CardContent className="text-center">
+              <Loader2 className="h-16 w-16 text-red-9 mx-auto mb-4 animate-spin" />
+              <h2 className="text-3xl font-monorama font-bold text-white mb-2">Loading Portfolio</h2>
+              <p className="text-zinc-400">
                 Fetching your staking positions and rewards...
               </p>
             </CardContent>
@@ -285,21 +126,29 @@ export default function Portfolio() {
 
   if (!hasPosition) {
     return (
-      <main className="flex min-h-screen flex-col items-center pt-32 pb-8 px-4">
-        <div className="w-full max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-white mb-8">Your Portfolio</h1>
+      <main className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
+        <div className="fixed inset-0 bg-[#050505] -z-20" />
+        <GridTraffic />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
-          <Card className="modern-card">
-            <CardContent className="p-12 text-center">
-              <TrendingUp className="h-16 w-16 text-[#666666] mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-white mb-2">No Active Positions</h2>
-              <p className="text-[#999999] mb-6">
+        <div className="w-full max-w-lg mx-auto relative z-10">
+          <Card className="modern-card p-8">
+            <CardContent className="text-center">
+              <TrendingUp className="h-16 w-16 text-red-9/50 mx-auto mb-4 animate-in zoom-in-50 duration-500" />
+              <h2 className="text-3xl font-monorama font-bold text-white mb-2 animate-in fade-in-up duration-700 delay-100">No Active Positions</h2>
+              <p className="text-zinc-400 mb-6 animate-in fade-in-up duration-700 delay-200">
                 You don&apos;t have any active staking positions yet. Start staking to see your portfolio here.
               </p>
-              <Link href="/">
-                <Button className="bg-red-600 hover:bg-red-700 text-white">
-                  Start Staking
-                </Button>
+              <Link href="#" className="block group/btn">
+                  <Button
+                      className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
+                      style={{
+                          clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                      }}
+                  >
+                      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
+                      Start Staking
+                  </Button>
               </Link>
             </CardContent>
           </Card>
@@ -309,33 +158,33 @@ export default function Portfolio() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center pt-32 pb-8 px-4">
-      <div className="w-full max-w-6xl mx-auto space-y-8">
-        <h1 className="text-3xl font-bold text-white">Your Portfolio</h1>
+    <main className="relative min-h-screen flex flex-col items-center pt-32 pb-8 px-4 overflow-hidden selection:bg-red-9/30">
+      <div className="fixed inset-0 bg-[#050505] -z-20" />
+      <GridTraffic />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
+
+      <div className="w-full max-w-6xl mx-auto space-y-8 relative z-10 animate-in fade-in-up duration-700">
+        <h1 className="text-4xl font-monorama font-bold text-white text-center md:text-left drop-shadow-[0_0_10px_rgba(226,41,1,0.2)]">Your Portfolio</h1>
 
         {/* Portfolio Overview */}
-        <Card className="modern-card">
-          <CardContent className="p-4 overflow-hidden">
-            <div className="flex flex-nowrap items-stretch justify-between gap-1 sm:gap-3 w-full">
-              <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-white truncate">{formatNumber(realQuaiStaked)}</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Total Staked</div>
-                <div className="text-[10px] sm:text-xs text-[#666666] truncate">QUAI</div>
+        <Card className="modern-card p-4 overflow-hidden border border-red-9/20">
+          <CardContent className="p-0"> {/* Remove default padding */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-red-9/10">
+              <div className="text-center px-2 py-3">
+                <div className="text-xl sm:text-2xl font-monorama font-bold text-white truncate">{formatNumber(realQuaiStaked)} QUAI</div>
+                <div className="text-xs text-zinc-500 truncate mt-1">Total Staked</div>
               </div>
-              <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-orange-400 truncate">{formatNumber(Number(formatBalance(realQuaiClaimable)))}</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Claimable</div>
-                <div className="text-[10px] sm:text-xs text-[#666666] truncate">QUAI</div>
+              <div className="text-center px-2 py-3">
+                <div className="text-xl sm:text-2xl font-monorama font-bold text-red-400 truncate">{formatNumber(Number(formatBalance(realQuaiClaimable)))} QUAI</div>
+                <div className="text-xs text-zinc-500 truncate mt-1">Claimable</div>
               </div>
-              <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-red-400 truncate">{realQuaiApr.toLocaleString('en-US', { maximumFractionDigits: 1 })}%</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">APR</div>
-                <div className="text-[10px] sm:text-xs text-[#666666] truncate">Current</div>
+              <div className="text-center px-2 py-3">
+                <div className="text-xl sm:text-2xl font-monorama font-bold text-green-400 truncate">+{realQuaiApr.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</div>
+                <div className="text-xs text-zinc-500 truncate mt-1">Current APR</div>
               </div>
-              <div className="text-center flex-1 min-w-0 px-1">
-                <div className="text-[11px] sm:text-sm md:text-xl font-bold text-orange-500 truncate">1</div>
-                <div className="text-[10px] sm:text-xs text-[#999999] truncate">Active Position</div>
-                <div className="text-[10px] sm:text-xs text-[#666666] truncate">Pool</div>
+              <div className="text-center px-2 py-3">
+                <div className="text-xl sm:text-2xl font-monorama font-bold text-white truncate">1</div>
+                <div className="text-xs text-zinc-500 truncate mt-1">Active Pool</div>
               </div>
             </div>
           </CardContent>
@@ -343,17 +192,30 @@ export default function Portfolio() {
 
         {/* Claimable Rewards */}
         {realQuaiClaimable > 0 && (
-          <Card className="modern-card bg-gradient-to-r from-red-900/20 to-orange-800/10 border-red-700/30">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-600/20 rounded-lg">
-                  <Gift className="h-5 w-5 text-orange-400" />
+          <Card className="modern-card bg-gradient-to-r from-red-950/30 to-black/30 border border-red-9/20 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-[url('/images/grid-pattern.png')] opacity-10 group-hover:opacity-20 transition-opacity" />
+            <CardContent className="p-6 relative z-10">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-red-9/20 rounded-full">
+                    <Gift className="h-6 w-6 text-red-9" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-monorama font-semibold text-white">Available Rewards</h3>
+                    <p className="text-3xl font-monorama font-bold text-red-400">{formatBalance(realQuaiClaimable)} QUAI</p>
+                    <p className="text-xs text-zinc-500">Claim your accumulated rewards below.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-white">Available Rewards</h3>
-                  <p className="text-2xl font-bold text-orange-400">{formatBalance(realQuaiClaimable)} QUAI</p>
-                  <p className="text-xs text-[#999999]">Claim rewards from your position below</p>
-                </div>
+                <Button
+                    className="bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase relative overflow-hidden transition-all clip-button h-12 w-full sm:w-auto px-8"
+                    style={{
+                        clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                    }}
+                    onClick={() => staking.claimRewards()}
+                    disabled={staking.isTransacting}
+                >
+                    {staking.isTransacting ? 'Claiming...' : 'Claim Rewards'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -361,7 +223,7 @@ export default function Portfolio() {
 
         {/* Active Position */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-white">Active Position</h2>
+          <h2 className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Active Staking Position</h2>
 
           <Card className="modern-card">
             <CardContent className="p-6">
@@ -370,56 +232,44 @@ export default function Portfolio() {
                 <div className="flex items-center gap-3">
                   <TokenLogo size={32} />
                   <div>
-                    <h3 className="text-lg font-semibold text-white">QUAI</h3>
+                    <h3 className="text-lg font-monorama font-semibold text-white">QUAI Staking Pool</h3>
                     <div className="flex items-center gap-2">
-                      <span className="text-orange-400 text-sm font-medium">
-                        {realQuaiApr >= 1000
-                          ? `${Math.round(realQuaiApr).toLocaleString('en-US')}%`
-                          : `${realQuaiApr.toLocaleString('en-US', { maximumFractionDigits: 1 })}%`} APR
+                      <span className="text-green-400 text-sm font-monorama font-medium">
+                        Live
                       </span>
                     </div>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {realQuaiClaimable > 0 && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
-                      onClick={() => staking.claimRewards()}
-                      disabled={staking.isTransacting}
-                    >
-                      {staking.isTransacting ? 'Claiming...' : 'Claim'}
-                    </Button>
-                  )}
                   {/* Withdrawal Actions */}
                   {staking.userInfo?.isInExitPeriod && (
                     staking.userInfo?.canExecuteWithdraw ? (
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="border-green-500 text-green-400 hover:bg-green-500 hover:text-white"
+                        className="bg-green-600 hover:bg-green-700 text-white font-monorama uppercase"
                         onClick={() => staking.executeWithdraw()}
                         disabled={staking.isTransacting}
                       >
-                        {staking.isTransacting ? 'Processing...' : 'Complete'}
+                        {staking.isTransacting ? 'Processing...' : 'Complete Withdrawal'}
                       </Button>
                     ) : (
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white font-monorama uppercase"
                         onClick={() => staking.cancelWithdraw()}
                         disabled={staking.isTransacting}
                       >
-                        Cancel
+                        Cancel Withdrawal
                       </Button>
                     )
                   )}
 
                   <Link href="/stake/native-quai?mode=manage">
-                    <Button size="sm" variant="outline" className="border-[#333333] text-[#999999] hover:bg-[#222222]">
-                      Manage
+                    <Button 
+                      size="sm" 
+                      className="bg-red-9/20 border border-red-9/50 text-red-9 hover:bg-red-9 hover:text-white font-monorama uppercase transition-all duration-300"
+                    >
+                      Manage Stake
                       <ArrowRight className="h-3 w-3 ml-1" />
                     </Button>
                   </Link>
@@ -427,36 +277,39 @@ export default function Portfolio() {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
-                  <div className="text-lg font-bold text-white">{formatNumber(realQuaiStaked)}</div>
-                  <div className="text-xs text-[#999999]">Staked QUAI</div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 pt-4 border-t border-red-9/10">
+                <div className="text-center p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
+                  <div className="text-xl font-monorama font-bold text-white">{formatNumber(realQuaiStaked)} QUAI</div>
+                  <div className="text-xs text-zinc-500 mt-1">Staked Amount</div>
                 </div>
 
-                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
-                  <div className="text-lg font-bold text-white">{formatBalance(realQuaiClaimable)}</div>
-                  <div className="text-xs text-[#999999]">Claimable Now</div>
+                <div className="text-center p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
+                  <div className="text-xl font-monorama font-bold text-red-400">{formatBalance(realQuaiClaimable)} QUAI</div>
+                  <div className="text-xs text-zinc-500 mt-1">Claimable Rewards</div>
                 </div>
 
-                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg">
-                  <div className="text-lg font-bold text-white">Instant</div>
-                  <div className="text-xs text-[#999999]">Rewards</div>
+                <div className="text-center p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
+                  <div className="text-xl font-monorama font-bold text-white">Instant</div>
+                  <div className="text-xs text-zinc-500 mt-1">Reward Distribution</div>
                 </div>
 
-                <div className="text-center p-3 bg-[#0a0a0a] rounded-lg flex flex-col justify-center">
+                <div className="text-center p-3 bg-zinc-900/50 rounded-lg border border-zinc-800 flex flex-col justify-center">
                   {staking.userInfo?.isInExitPeriod ? (
                     <>
-                      <div className="text-lg font-bold text-white">{formatTimeLeft(staking.userInfo?.timeUntilWithdrawalAvailable || 0)}</div>
-                      <div className="text-xs text-[#999999]">Exit Window</div>
+                      <div className="text-xl font-monorama font-bold text-white">{formatTimeLeft(staking.userInfo?.timeUntilWithdrawalAvailable || 0)}</div>
+                      <div className="text-xs text-zinc-500 mt-1">Exit Window</div>
                     </>
                   ) : (
                     <>
-                      <div className="text-lg font-bold text-green-400">Active</div>
-                      <div className="text-xs text-[#999999]">Status</div>
+                      <div className="text-xl font-monorama font-bold text-green-400">Active</div>
+                      <div className="text-xs text-zinc-500 mt-1">Status</div>
                     </>
                   )}
                 </div>
               </div>
+              <p className="text-xs text-zinc-500 text-center uppercase tracking-wide font-mono mt-2">
+                Withdrawal locked for 30 days after request.
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -464,17 +317,17 @@ export default function Portfolio() {
         {/* Quick Actions */}
         <Card className="modern-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-white">Quick Actions</CardTitle>
+            <CardTitle className="text-xl font-monorama font-bold text-white drop-shadow-[0_0_5px_rgba(226,41,1,0.1)]">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="flex flex-wrap gap-3">
               <Link href="/">
-                <Button variant="outline" size="sm" className="border-[#333333] text-[#999999] hover:bg-[#222222]">
+                <Button variant="outline" size="sm" className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase">
                   Stake More
                 </Button>
               </Link>
               <Link href="/calculator">
-                <Button variant="outline" size="sm" className="border-[#333333] text-[#999999] hover:bg-[#222222]">
+                <Button variant="outline" size="sm" className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase">
                   Calculator
                 </Button>
               </Link>
@@ -483,7 +336,7 @@ export default function Portfolio() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="outline" size="sm" className="border-[#333333] text-[#999999] hover:bg-[#222222]">
+                <Button variant="outline" size="sm" className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase">
                   Explorer
                   <ExternalLink className="h-3 w-3 ml-1" />
                 </Button>

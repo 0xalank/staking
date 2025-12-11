@@ -3,23 +3,26 @@ import React, { useContext, useState } from 'react';
 import { StateContext } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useStaking } from '@/lib/hooks/useStaking';
 import { StakingInfo } from '@/components/ui/staking-info';
+import { GridTraffic } from '../../page'; // Assuming GridTraffic is exported from homepage
+import { cn } from '@/lib/utils';
 
 // Token Logo Component
 const TokenLogo = ({ size = 24 }: { size?: number }) => {
   return (
-    <div className="flex items-center">
+    <div className="relative flex items-center justify-center">
+      <div className="absolute inset-0 bg-red-9/20 rounded-full blur-md" />
       <Image
         src="/images/quai-logo.png"
         alt="QUAI"
         width={size}
         height={size}
-        className="rounded-full"
+        className="rounded-full relative z-10"
       />
     </div>
   );
@@ -28,8 +31,8 @@ const TokenLogo = ({ size = 24 }: { size?: number }) => {
 // Pool data - only native QUAI
 const poolData = {
   id: 'native-quai',
-  name: 'QUAI',
-  description: 'Stake QUAI tokens and earn instant rewards',
+  name: '$QUAI',
+  description: 'Stake $QUAI tokens and earn instant rewards',
 };
 
 export default function StakePage() {
@@ -45,12 +48,22 @@ export default function StakePage() {
   // Only support native-quai pool
   if (poolId !== 'native-quai') {
     return (
-      <main className="flex min-h-screen flex-col items-center pt-32 pb-8 px-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Pool Not Found</h1>
-          <Link href="/">
-            <Button className="bg-red-600 hover:bg-red-700 text-white">
-              Back to Pools
+      <main className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
+        <div className="fixed inset-0 bg-[#050505] -z-20" />
+        <GridTraffic />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
+
+        <div className="text-center relative z-10">
+          <h1 className="text-3xl font-monorama font-bold text-white mb-4 drop-shadow-[0_0_10px_rgba(226,41,1,0.2)]">Pool Not Found</h1>
+          <Link href="/" className="block group/btn">
+            <Button 
+                className="h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button px-8"
+                style={{
+                    clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                }}
+            >
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
+                Back to Pools
             </Button>
           </Link>
         </div>
@@ -59,53 +72,57 @@ export default function StakePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center pt-24 md:pt-32 pb-8 px-3 sm:px-4">
-      <div className="w-full max-w-2xl mx-auto">
+    <main className="relative min-h-screen flex flex-col items-center pt-20 sm:pt-32 pb-8 px-2 sm:px-4 overflow-hidden selection:bg-red-9/30">
+      <div className="fixed inset-0 bg-[#050505] -z-20" />
+      <GridTraffic />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
+
+      <div className="w-full max-w-2xl mx-auto relative z-10 animate-in fade-in-up duration-700">
 
         {/* Back Button */}
         <div className="mb-4 sm:mb-6">
-          <Link href="/" className="flex items-center gap-2 text-[#999999] hover:text-white transition-colors">
+          <Link href="/" className="flex items-center gap-2 text-zinc-500 hover:text-red-9 transition-colors font-monorama uppercase text-sm">
             <ArrowLeft className="h-4 w-4" />
-            Back to Pools
+            Back to All Pools
           </Link>
         </div>
 
         {/* Pool Header */}
-        <Card className="bg-[#1a1a1a] border border-[#333333] mb-6">
+        <Card className="modern-card border border-red-9/20 mb-6">
           <CardHeader>
             <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap">
               <TokenLogo size={48} />
               <div className="text-center sm:text-left">
-                <CardTitle className="text-xl sm:text-2xl text-white">{poolData.name}</CardTitle>
-                <p className="text-[#999999] text-sm sm:text-base">{poolData.description}</p>
+                <CardTitle className="text-xl sm:text-2xl font-monorama font-bold text-white">{poolData.name} Pool</CardTitle>
+                <p className="text-zinc-400 text-sm sm:text-base">{poolData.description}</p>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 border-t border-red-9/10 pt-4">
               <div className="text-center">
-                <div className="text-base sm:text-lg font-bold text-white">
+                <div className="text-base sm:text-lg font-monorama font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
                   {staking.isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
-                      <span className="text-xs text-[#666666]">Loading...</span>
+                      <Loader2 className="animate-spin rounded-full h-4 w-4 text-red-9" />
+                      <span className="text-xs text-zinc-500">Loading...</span>
                     </div>
                   ) : staking.contractInfo ? (
                     <span>
-                      {staking.contractInfo.apy.toLocaleString('en-US', { maximumFractionDigits: 1 })}%
+                      {(staking.contractInfo.apy ?? 0) >= 0 ? '+' : ''}{(staking.contractInfo.apy ?? 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%
                     </span>
                   ) : (
                     '—'
                   )}
                 </div>
-                <div className="text-xs text-[#666666]">APR</div>
+                <div className="text-xs text-zinc-500 mt-1">APR</div>
               </div>
               <div className="text-center">
-                <div className="text-base sm:text-lg font-bold text-white">
+                <div className="text-base sm:text-lg font-monorama font-bold text-white">
                   {staking.isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
-                      <span className="text-xs text-[#666666]">Loading...</span>
+                      <Loader2 className="animate-spin rounded-full h-4 w-4 text-red-9" />
+                      <span className="text-xs text-zinc-500">Loading...</span>
                     </div>
                   ) : staking.contractInfo ? (
                     (() => {
@@ -115,35 +132,35 @@ export default function StakePage() {
                     })()
                   ) : (
                     '—'
-                  )}
+                  )} QUAI
                 </div>
-                <div className="text-xs text-[#666666]">Active Staked</div>
+                <div className="text-xs text-zinc-500 mt-1">Active Staked</div>
               </div>
               <div className="text-center">
-                <div className="text-base sm:text-lg font-bold text-white">
+                <div className="text-base sm:text-lg font-monorama font-bold text-white">
                   {staking.isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
-                      <span className="text-xs text-[#666666]">Loading...</span>
+                      <Loader2 className="animate-spin rounded-full h-4 w-4 text-red-9" />
+                      <span className="text-xs text-zinc-500">Loading...</span>
                     </div>
                   ) : (
                     'Instant'
                   )}
                 </div>
-                <div className="text-xs text-[#666666]">Rewards</div>
+                <div className="text-xs text-zinc-500 mt-1">Rewards</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-white">
+                <div className="text-lg font-monorama font-bold text-white">
                   {staking.isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
-                      <span className="text-xs text-[#666666]">Loading...</span>
+                      <Loader2 className="animate-spin rounded-full h-4 w-4 text-red-9" />
+                      <span className="text-xs text-zinc-500">Loading...</span>
                     </div>
                   ) : (
-                    '30 days'
+                    '30 Days'
                   )}
                 </div>
-                <div className="text-xs text-[#666666]">Withdrawal Lock</div>
+                <div className="text-xs text-zinc-500 mt-1">Withdrawal Lock</div>
               </div>
             </div>
 
@@ -153,16 +170,14 @@ export default function StakePage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowDetails(!showDetails)}
-                className="border-[#333333] text-[#999999] hover:bg-[#222222] flex items-center"
+                className="bg-zinc-900/50 border border-zinc-700 text-zinc-400 hover:bg-red-9/20 hover:border-red-9/50 hover:text-red-9 font-monorama uppercase flex items-center"
               >
                 {showDetails ? (
                   <span className="inline-flex items-center">
-                    <ChevronUp className="w-4 h-4 mr-2" />
                     Hide Details
                   </span>
                 ) : (
                   <span className="inline-flex items-center">
-                    <ChevronDown className="w-4 h-4 mr-2" />
                     Show Details
                   </span>
                 )}
@@ -172,12 +187,12 @@ export default function StakePage() {
 
           {/* Detailed Information */}
           {showDetails && staking.contractInfo && (
-            <CardContent className="pt-0 border-t border-[#333333]">
+            <CardContent className="pt-0 border-t border-red-9/10">
               <div className="space-y-3">
                  <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-1">
-                    <p className="text-[#999999]">Current Block</p>
-                    <p className="font-medium text-white">
+                    <p className="text-zinc-400">Current Block</p>
+                    <p className="font-monorama font-medium text-white">
                       <a
                         href={`https://quaiscan.io/block/${staking.contractInfo.currentBlock}`}
                         target="_blank"
@@ -190,32 +205,32 @@ export default function StakePage() {
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[#999999]">Reward Per Block</p>
-                    <p className="font-medium text-white">
-                      {Number(staking.contractInfo.rewardPerBlockFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} QUAI
+                    <p className="text-zinc-400">Reward Per Block</p>
+                    <p className="font-monorama font-medium text-white">
+                      {Number(staking.contractInfo.rewardPerBlockFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} $QUAI
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-1">
-                    <p className="text-[#999999]">Contract Balance</p>
-                    <p className="font-medium text-white">
-                      {Number(staking.contractInfo.contractBalanceFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} QUAI
+                    <p className="text-zinc-400">Contract Balance</p>
+                    <p className="font-monorama font-medium text-white">
+                      {Number(staking.contractInfo.contractBalanceFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} $QUAI
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[#999999]">Reward Balance</p>
-                    <p className="font-medium text-white">
-                      {Number(staking.contractInfo.rewardBalanceFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} QUAI
+                    <p className="text-zinc-400">Reward Balance</p>
+                    <p className="font-monorama font-medium text-white">
+                      {Number(staking.contractInfo.rewardBalanceFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} $QUAI
                     </p>
                   </div>
                 </div>
 
                 {staking.contractInfo.hasUserLimit && (
-                  <div className="p-3 bg-[#222222] rounded-md">
-                    <p className="text-[#999999] text-sm">
-                      Pool Limit Per User: {Number(staking.contractInfo.poolLimitPerUserFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} QUAI
+                  <div className="p-3 bg-zinc-900 border border-red-9/20 rounded-md">
+                    <p className="text-zinc-400 text-sm">
+                      Pool Limit Per User: {Number(staking.contractInfo.poolLimitPerUserFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} $QUAI
                     </p>
                   </div>
                 )}
@@ -238,10 +253,10 @@ export default function StakePage() {
           onCancelWithdraw={staking.cancelWithdraw}
           onClaimRewards={staking.claimRewards}
           onRefresh={staking.refreshData}
-          stakedSymbol="QUAI"
-          rewardSymbol="QUAI"
+          stakedSymbol="$QUAI"
+          rewardSymbol="$QUAI"
           availableBalanceFormatted={staking.contractInfo?.userQuaiBalanceFormatted}
-          availableBalanceLabel="QUAI Balance"
+          availableBalanceLabel="$QUAI Balance"
         />
       </div>
     </main>

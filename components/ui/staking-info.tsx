@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
-import { UserStakingInfo, ContractInfo, DelayedReward } from '@/lib/hooks/useStaking';
+import { UserStakingInfo, ContractInfo } from '@/lib/hooks/useStaking';
 import { Progress } from '@/components/ui/progress';
 import { formatUnits } from 'quais';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { TOKEN_SYMBOL } from '@/lib/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, ChevronDown, ChevronUp, ExternalLink, Lock, Clock, Timer, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Loader2, ExternalLink, Lock, Clock, Timer, AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatQuai } from '@/lib/hooks/useStaking';
-import { formatBalance } from '@/lib/utils/formatBalance';
-import { SECONDS_PER_BLOCK, WITHDRAWAL_LOCK_PERIOD } from '@/lib/config';
+import { SECONDS_PER_BLOCK } from '@/lib/config';
 
 interface StakingInfoProps {
   userInfo: UserStakingInfo | null;
@@ -46,8 +44,8 @@ export function StakingInfo({
   onCancelWithdraw,
   onClaimRewards,
   onRefresh,
-  stakedSymbol,
-  rewardSymbol,
+  stakedSymbol = '$QUAI',
+  rewardSymbol = '$QUAI',
   availableBalanceFormatted,
   availableBalanceLabel
 }: StakingInfoProps) {
@@ -63,12 +61,10 @@ export function StakingInfo({
     if (asNum < 0.001) return asNum.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 6 });
     return asNum.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
   };
-  const [showDetails, setShowDetails] = useState(false);
+  const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw' | 'rewards'>('deposit');
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw' | 'rewards'>('deposit');
-  const STAKED_SYMBOL = stakedSymbol || TOKEN_SYMBOL;
-  const REWARD_SYMBOL = rewardSymbol || TOKEN_SYMBOL;
+  
 
   const handleDeposit = async () => {
     if (!depositAmount || parseFloat(depositAmount) <= 0) return;
@@ -123,10 +119,10 @@ export function StakingInfo({
 
   if (isLoading) {
     return (
-      <Card className="modern-card overflow-hidden">
+      <Card className="modern-card overflow-hidden border border-red-9/20">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl text-white">Loading Staking Information</CardTitle>
-          <CardDescription className="text-[#999999]">
+          <CardTitle className="text-xl font-monorama text-white">Loading Staking Information</CardTitle>
+          <CardDescription className="text-zinc-400">
             Please wait while we fetch your staking details...
           </CardDescription>
         </CardHeader>
@@ -137,99 +133,65 @@ export function StakingInfo({
     );
   }
 
-  // Precompute UI fragments to simplify JSX
-  const lockStatusNode = (() => {
-    if (!userInfo) return 'Unlocked';
-    if (userInfo.isLocked) {
-      return (
-        <span className="inline-flex items-center gap-1">
-          <Lock className="h-3 w-3" />
-          {`Locked (${formatTimeRemaining(userInfo.timeUntilUnlock)})`}
-        </span>
-      );
-    }
-    return 'Unlocked';
-  })();
-
-  const depositBtnContent = isTransacting ? (
-    <span className="inline-flex items-center">
-      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      {transactionStage === 'approving' ? 'Approving...' : (transactionStage === 'staking' ? 'Staking...' : 'Processing...')}
-    </span>
-  ) : (
-    'Deposit'
-  );
-
-  const canWithdraw = !!(userInfo && (userInfo.isInExitPeriod || userInfo.canExecuteWithdraw));
-  const withdrawBtnContent = isTransacting ? (
-    <span className="inline-flex items-center">
-      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      Processing...
-    </span>
-  ) : !canWithdraw ? (
-    <span className="inline-flex items-center">
-      <Lock className="mr-2 h-4 w-4" />
-      Locked
-    </span>
-  ) : (
-    'Withdraw'
-  );
-
-  const claimBtnContent = isTransacting
-    ? (
-      <span className="inline-flex items-center">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Processing...
-      </span>
-    )
-    : `Claim ${userInfo?.pendingRewardsFormatted ?? ''} ${TOKEN_SYMBOL}`;
-
-  // Component for displaying delayed rewards
-  const DelayedRewardsDisplay = () => {
-    if (!userInfo?.delayedRewards.length) {
-      return (
-        <div className="text-center py-4">
-          <p className="text-[#999999]">No delayed rewards</p>
-        </div>
-      );
-    }
+  // Component for displaying rewards (instant rewards - no vesting)
+  const RewardsDisplay = () => {
+    const hasClaimableRewards = userInfo && userInfo.claimableRewards > BigInt(0);
+    const hasDelayedRewards = userInfo?.delayedRewards?.length > 0;
 
     return (
       <div className="space-y-3">
-        <h4 className="font-medium text-white">Vesting Rewards</h4>
-        {userInfo.delayedRewards.map((reward, index) => (
-          <div key={index} className="p-3 bg-[#222222] rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-white font-medium">
-                {withCommas(reward.amountFormatted)} {TOKEN_SYMBOL}
-              </span>
-              <span className={cn(
-                "text-sm",
-                reward.timeUntilUnlock <= 0 ? "text-green-400" : "text-yellow-400"
-              )}>
-                {reward.timeUntilUnlock <= 0 ? 'Ready!' : formatTimeRemaining(reward.timeUntilUnlock)}
-              </span>
+        {/* Show claimable rewards and claim button */}
+        {hasClaimableRewards ? (
+          <>
+            <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="text-zinc-300 font-monorama">Claimable Rewards</span>
+                <span className="text-green-400 font-monorama font-bold text-lg">
+                  {withCommas(userInfo.claimableRewardsFormatted)} {rewardSymbol}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
-        {userInfo && userInfo.claimableRewards > BigInt(0) ? (
-          <Button
-            onClick={onClaimRewards}
-            disabled={isTransacting}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
-          >
-            {isTransacting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              `Claim ${withCommas(userInfo.claimableRewardsFormatted)} QUAI`
-            )}
-          </Button>
+            <Button
+              onClick={onClaimRewards}
+              disabled={isTransacting}
+              className="w-full bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase transition-colors"
+            >
+              {isTransacting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                `Claim ${withCommas(userInfo.claimableRewardsFormatted)} ${rewardSymbol}`
+              )}
+            </Button>
+          </>
         ) : (
-          <div className="text-center text-sm text-[#999999]">
-            No rewards available to claim yet.
+          <div className="text-center py-4">
+            <p className="text-zinc-400">No rewards available to claim yet.</p>
+            <p className="text-zinc-500 text-xs mt-1">Rewards accrue in real-time as you stake.</p>
+          </div>
+        )}
+
+        {/* Show delayed/vesting rewards if any exist (legacy support) */}
+        {hasDelayedRewards && (
+          <div className="mt-4 pt-4 border-t border-red-9/10">
+            <h4 className="font-monorama font-medium text-white mb-3">Vesting Rewards</h4>
+            {userInfo.delayedRewards.map((reward, index) => (
+              <div key={index} className="p-3 bg-zinc-900 border border-red-9/20 rounded-lg mb-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">
+                    {withCommas(reward.amountFormatted)} {stakedSymbol}
+                  </span>
+                  <span className={cn(
+                    "text-sm font-monorama",
+                    reward.timeUntilUnlock <= 0 ? "text-red-400" : "text-orange-400"
+                  )}>
+                    {reward.timeUntilUnlock <= 0 ? 'Ready!' : formatTimeRemaining(reward.timeUntilUnlock)}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -245,12 +207,12 @@ export function StakingInfo({
     return (
       <div className="space-y-3">
         <div className={cn(
-          "p-3 rounded-lg text-center",
+          "p-3 rounded-lg text-center border",
           userInfo.canExecuteWithdraw
-            ? "bg-green-500/10 text-green-400"
-            : "bg-orange-500/10 text-orange-400"
+            ? "bg-green-500/10 text-green-400 border-green-9/20"
+            : "bg-red-9/10 text-red-400 border-red-9/20"
         )}>
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="flex items-center justify-center gap-2 mb-2 font-monorama">
             {userInfo.canExecuteWithdraw ? (
               <CheckCircle className="h-5 w-5" />
             ) : (
@@ -273,7 +235,7 @@ export function StakingInfo({
             <Button
               onClick={handleExecuteWithdraw}
               disabled={isTransacting}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold tracking-widest uppercase"
             >
               {isTransacting ? (
                 <>
@@ -292,7 +254,7 @@ export function StakingInfo({
             variant="outline"
             className={cn(
               userInfo.canExecuteWithdraw ? "flex-1" : "w-full",
-              "border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white"
+              "border-red-400 text-red-400 hover:bg-red-400/10 hover:text-red-300 font-bold tracking-widest uppercase"
             )}
           >
             {isTransacting ? (
@@ -311,24 +273,22 @@ export function StakingInfo({
 
   return (
     <div className="space-y-4">
-      <Card className="modern-card overflow-hidden">
-        <CardHeader>
-        </CardHeader>
+      <Card className="modern-card overflow-hidden border border-red-9/20">
         <CardContent className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-500/10 text-red-400 rounded-md text-sm mb-4">
-              {error}
+            <div className="p-3 bg-red-9/10 text-red-400 rounded-md text-sm mb-4 border border-red-9/20">
+              <AlertTriangle className="inline-block h-4 w-4 mr-2" /> {error}
             </div>
           )}
 
           {transactionHash && (
-            <div className="p-3 bg-green-500/10 text-green-400 rounded-md text-sm mb-2">
-              Transaction submitted:{' '}
+            <div className="p-3 bg-green-500/10 text-green-400 rounded-md text-sm mb-2 border border-green-9/20">
+              <CheckCircle className="inline-block h-4 w-4 mr-2" /> Transaction submitted:{' '}
               <a
                 href={`https://quaiscan.io/tx/${transactionHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-green-300"
+                className="underline hover:text-red-400"
               >
                 View on Explorer <ExternalLink className="inline h-3 w-3" />
               </a>
@@ -338,21 +298,21 @@ export function StakingInfo({
 
           {/* User Staking Info */}
           {userInfo && userInfo.stakedAmount > BigInt(0) && (
-            <div className="space-y-2">
+            <div className="space-y-2 font-monorama p-4">
               <div className="flex justify-between">
-                <span className="text-[#999999]">Your Stake</span>
+                <span className="text-zinc-400">Your Stake</span>
                 <span className="font-medium text-white">
-                  {withCommas(userInfo.stakedAmountFormatted)} {STAKED_SYMBOL}
+                  {withCommas(userInfo.stakedAmountFormatted)} {stakedSymbol}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#999999]">Claimable Rewards</span>
-                <span className="font-medium text-white">
-                  {withCommas(userInfo.claimableRewardsFormatted)} {REWARD_SYMBOL}
+                <span className="text-zinc-400">Claimable Rewards</span>
+                <span className="font-medium bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                  {withCommas(userInfo.claimableRewardsFormatted)} {rewardSymbol}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#999999]">Status</span>
+                <span className="text-zinc-400">Status</span>
                 <span className="font-medium text-sm text-white">
                   {userInfo.userStatus}
                 </span>
@@ -360,14 +320,14 @@ export function StakingInfo({
               {userInfo.isInExitPeriod && (
                 <>
                   <div className="flex justify-between">
-                    <span className="text-[#999999]">Pending Withdrawal</span>
+                    <span className="text-zinc-400">Pending Withdrawal</span>
                     <span className="font-medium text-orange-400">
-                      {withCommas(userInfo.withdrawalAmountFormatted)} {STAKED_SYMBOL}
+                      {withCommas(userInfo.withdrawalAmountFormatted)} {stakedSymbol}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#999999]">Withdrawal Available</span>
-                    <span className="font-medium text-orange-400">
+                    <span className="text-zinc-400">Withdrawal Available</span>
+                    <span className="font-medium text-red-400">
                       {userInfo.canExecuteWithdraw ? 'Ready!' : formatTimeRemaining(userInfo.timeUntilWithdrawalAvailable)}
                     </span>
                   </div>
@@ -378,39 +338,39 @@ export function StakingInfo({
 
           {/* Action Tabs */}
           <div className="pt-4">
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-4 p-1 bg-zinc-900 border border-red-9/20 rounded-lg">
               <Button
-                variant={activeTab === 'deposit' ? 'default' : 'outline'}
+                variant="ghost"
                 onClick={() => setActiveTab('deposit')}
                 className={cn(
-                  'flex-1',
+                  'flex-1 font-monorama uppercase text-sm',
                   activeTab === 'deposit'
-                    ? 'bg-red-9 hover:bg-red-10 text-white'
-                    : 'border-[#333333] text-[#999999] hover:bg-[#222222]'
+                    ? 'bg-red-9 text-white shadow-md shadow-red-9/30'
+                    : 'text-zinc-400 hover:bg-zinc-800'
                 )}
               >
                 Deposit
               </Button>
               <Button
-                variant={activeTab === 'withdraw' ? 'default' : 'outline'}
+                variant="ghost"
                 onClick={() => setActiveTab('withdraw')}
                 className={cn(
-                  'flex-1',
+                  'flex-1 font-monorama uppercase text-sm',
                   activeTab === 'withdraw'
-                    ? 'bg-red-9 hover:bg-red-10 text-white'
-                    : 'border-[#333333] text-[#999999] hover:bg-[#222222]'
+                    ? 'bg-red-9 text-white shadow-md shadow-red-9/30'
+                    : 'text-zinc-400 hover:bg-zinc-800'
                 )}
               >
                 Withdraw
               </Button>
               <Button
-                variant={activeTab === 'rewards' ? 'default' : 'outline'}
+                variant="ghost"
                 onClick={() => setActiveTab('rewards')}
                 className={cn(
-                  'flex-1',
+                  'flex-1 font-monorama uppercase text-sm',
                   activeTab === 'rewards'
-                    ? 'bg-red-9 hover:bg-red-10 text-white'
-                    : 'border-[#333333] text-[#999999] hover:bg-[#222222]'
+                    ? 'bg-red-9 text-white shadow-md shadow-red-9/30'
+                    : 'text-zinc-400 hover:bg-zinc-800'
                 )}
               >
                 Rewards
@@ -420,13 +380,13 @@ export function StakingInfo({
             {activeTab === 'deposit' && (
               <div className="space-y-3">
                 {availableBalanceFormatted && (
-                  <div className="flex items-center justify-between text-xs text-[#999999]">
-                    <span>{availableBalanceLabel || 'Available Balance'}</span>
+                  <div className="flex items-center justify-between text-sm text-zinc-400 font-monorama">
+                    <span>{availableBalanceLabel === "$QUAI Balance" ? "Your Balance" : availableBalanceLabel || 'Available Balance'}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-white">{withCommas(availableBalanceFormatted || '0')} {STAKED_SYMBOL}</span>
+                      <span className="text-white text-lg font-bold">{withCommas(availableBalanceFormatted || '0')} {stakedSymbol}</span>
                       <button
                         type="button"
-                        className="px-2 py-0.5 rounded bg-[#222222] text-[#bbbbbb] hover:bg-[#2a2a2a]"
+                        className="px-3 py-1 rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 font-monorama text-sm uppercase"
                         onClick={() => setDepositAmount(availableBalanceFormatted)}
                         disabled={isTransacting}
                       >
@@ -438,19 +398,19 @@ export function StakingInfo({
 
                 <Input
                   type="text"
-                  placeholder={`Amount to deposit (${STAKED_SYMBOL})`}
+                  placeholder={`Amount to deposit (${stakedSymbol})`}
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(formatInputWithCommas(e.target.value))}
-                  className="bg-[#222222] border-[#333333] text-white"
+                  className="bg-zinc-900 border-red-9/30 text-white font-monorama text-lg h-12"
                   disabled={isTransacting || userInfo?.isInExitPeriod}
                 />
 
                 {/* Deposit Information */}
                 {depositAmount && parseFloat(depositAmount) > 0 && contractInfo && (
-                  <div className="bg-[#0a0a0a] rounded-lg p-3 space-y-2 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-[#999999]">Estimated APR:</span>
-                      <span className="text-blue-400">
+                  <div className="bg-zinc-900 border border-red-9/20 rounded-lg p-3 space-y-2 text-xs">
+                    <div className="flex justify-between font-monorama">
+                      <span className="text-zinc-400">Estimated APR:</span>
+                      <span className="text-red-400">
                         {(() => {
                           const currentTotalStaked = parseFloat((contractInfo.activeStakedFormatted ?? contractInfo.totalStakedFormatted) || '0');
                           const newDeposit = parseFloat(depositAmount);
@@ -471,9 +431,9 @@ export function StakingInfo({
                         })()}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#999999]">Withdrawal Lock:</span>
-                      <span className="text-yellow-400">30 days after request</span>
+                    <div className="flex justify-between font-monorama">
+                      <span className="text-zinc-400">Withdrawal Lock:</span>
+                      <span className="text-red-400">30 days after request</span>
                     </div>
                   </div>
                 )}
@@ -485,7 +445,7 @@ export function StakingInfo({
                     parseFloat(depositAmount) <= 0 ||
                     userInfo?.isInExitPeriod
                   }
-                  className="w-full bg-red-9 hover:bg-red-10 text-white"
+                  className="w-full bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase transition-colors"
                 >
                   {isTransacting ? (
                     <>
@@ -497,7 +457,7 @@ export function StakingInfo({
                   )}
                 </Button>
                 {userInfo?.isInExitPeriod && (
-                  <p className="text-xs text-orange-400 text-center">
+                  <p className="text-xs text-red-400 text-center font-monorama">
                     Cannot deposit during exit period
                   </p>
                 )}
@@ -506,7 +466,7 @@ export function StakingInfo({
 
             {activeTab === 'withdraw' && (
               <div className="space-y-4">
-                <div className="p-3 bg-orange-500/10 text-orange-400 rounded-lg text-xs">
+                <div className="p-3 bg-red-9/10 text-red-400 rounded-lg text-xs border border-red-9/20 font-monorama">
                   <p className="font-medium mb-1">Withdrawal Lock Period:</p>
                   <p>Withdrawals require a 30-day lock period. During this period, rewards continue to accrue on your remaining staked amount.</p>
                 </div>
@@ -517,16 +477,16 @@ export function StakingInfo({
                     <div className="flex gap-2">
                       <Input
                         type="text"
-                        placeholder={`Amount to withdraw (${TOKEN_SYMBOL})`}
+                        placeholder={`Amount to withdraw (${stakedSymbol})`}
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(formatInputWithCommas(e.target.value))}
-                        className="bg-[#222222] border-[#333333] text-white flex-1"
+                        className="bg-zinc-900 border-red-9/30 text-white font-monorama flex-1"
                         disabled={isTransacting || !userInfo?.canRequestWithdraw}
                       />
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-auto border-[#333333] text-[#999999] hover:bg-[#222222]"
+                        className="w-auto bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800 font-monorama uppercase"
                         onClick={() => setWithdrawAmount(userInfo?.stakedAmountFormatted || '0')}
                         disabled={isTransacting || !userInfo?.canRequestWithdraw}
                       >
@@ -542,10 +502,10 @@ export function StakingInfo({
                         !userInfo?.canRequestWithdraw
                       }
                       className={cn(
-                        'w-full',
+                        'w-full bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase transition-colors',
                         !userInfo?.canRequestWithdraw
-                          ? 'bg-[#333333] text-[#999999]'
-                          : 'bg-red-9 hover:bg-red-10 text-white'
+                          ? 'opacity-50 cursor-not-allowed'
+                          : ''
                       )}
                     >
                       {isTransacting ? (
@@ -556,15 +516,15 @@ export function StakingInfo({
                       ) : !userInfo?.canRequestWithdraw ? (
                         <>
                           <Lock className="mr-2 h-4 w-4" />
-                          {userInfo?.isLocked ? 'Locked' : 'Cannot Withdraw'}
+                          {userInfo?.isLocked ? 'Locked' : 'Cannot Request Withdrawal'}
                         </>
                       ) : (
                         'Request Withdrawal'
                       )}
                     </Button>
                     {userInfo?.isInExitPeriod && !userInfo?.canExecuteWithdraw && (
-                      <div className="text-xs text-center space-y-1">
-                        <p className="text-yellow-400">
+                      <div className="text-xs text-center space-y-1 font-monorama">
+                        <p className="text-orange-400">
                           Withdrawal available in {formatTimeRemaining(userInfo.timeUntilWithdrawalAvailable)}
                         </p>
                       </div>
@@ -576,85 +536,21 @@ export function StakingInfo({
 
             {activeTab === 'rewards' && (
               <div className="space-y-4">
-                <div className="p-3 bg-green-500/10 text-green-400 rounded-lg text-xs">
-                  <p className="font-medium mb-1">Instant Rewards:</p>
-                  <p>Rewards accrue in real-time and are immediately claimable. No vesting period required.</p>
-                </div>
-                {userInfo && userInfo.claimableRewards > BigInt(0) ? (
-                  <Button
-                    onClick={onClaimRewards}
-                    disabled={isTransacting}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    {isTransacting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      `Claim ${withCommas(userInfo.claimableRewardsFormatted)} QUAI`
-                    )}
-                  </Button>
-                ) : (
-                  <div className="text-center text-sm text-[#999999]">
-                    No rewards available to claim yet.
-                  </div>
-                )}
+                <RewardsDisplay />
               </div>
             )}
           </div>
 
 
 
-          {/* Detailed Information */}
-          {showDetails && contractInfo && (
-            <div className="pt-4 border-t border-[#333333] space-y-3">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-1">
-                  <p className="text-[#999999]">Current Block</p>
-                  <p className="font-medium text-white">
-                    <a
-                      href={`https://quaiscan.io/block/${contractInfo.currentBlock}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center hover:text-red-9"
-                    >
-                      <span>{withCommas(contractInfo.currentBlock || 0)}</span>
-                      <ExternalLink className="w-3 h-3 ml-1" />
-                    </a>
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[#999999]">Reward Per Block</p>
-                  <p className="font-medium text-white">
-                    {withCommas(contractInfo.rewardPerBlockFormatted)} {TOKEN_SYMBOL}
-                  </p>
-                </div>
+          {/* Pool Limit Per User */}
+          {contractInfo?.hasUserLimit && (
+            <div className="pt-4 border-t border-red-9/10">
+              <div className="p-3 bg-zinc-900 border border-red-9/20 rounded-md">
+                <p className="text-zinc-400 text-sm font-monorama">
+                  Pool Limit Per User: {withCommas(contractInfo.poolLimitPerUserFormatted || '0')} {stakedSymbol}
+                </p>
               </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-1">
-                  <p className="text-[#999999]">Contract Balance</p>
-                  <p className="font-medium text-white">
-                    {withCommas(contractInfo.contractBalanceFormatted)} {TOKEN_SYMBOL}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[#999999]">Reward Balance</p>
-                  <p className="font-medium text-white">
-                    {withCommas(contractInfo.rewardBalanceFormatted)} {TOKEN_SYMBOL}
-                  </p>
-                </div>
-              </div>
-
-              {contractInfo.hasUserLimit && (
-                <div className="p-3 bg-[#222222] rounded-md">
-                  <p className="text-[#999999] text-sm">
-                    Pool Limit Per User: {contractInfo.poolLimitPerUserFormatted} {TOKEN_SYMBOL}
-                  </p>
-                </div>
-              )}
-
             </div>
           )}
         </CardContent>
