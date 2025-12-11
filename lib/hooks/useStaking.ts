@@ -542,7 +542,18 @@ export function useStaking() {
       const signer = await web3Provider.getSigner();
       const stakingContract = new Contract(STAKING_CONTRACT_ADDRESS, SmartChefNativeABI, signer);
 
-      const withdrawAmount = parseQuai(amount);
+      let withdrawAmount = parseQuai(amount);
+
+      // If the requested amount is very close to the staked amount (within 0.001 QUAI),
+      // use the exact staked amount to handle formatting rounding issues
+      const tolerance = parseQuai('0.001');
+      const diff = userInfo.stakedAmount > withdrawAmount
+        ? userInfo.stakedAmount - withdrawAmount
+        : withdrawAmount - userInfo.stakedAmount;
+
+      if (diff <= tolerance && withdrawAmount <= userInfo.stakedAmount + tolerance) {
+        withdrawAmount = userInfo.stakedAmount;
+      }
 
       // Check staked amount
       if (withdrawAmount > userInfo.stakedAmount) {
