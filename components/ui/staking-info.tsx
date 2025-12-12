@@ -635,19 +635,6 @@ export function StakingInfo({
               </div>
             )}
           </div>
-
-
-
-          {/* Pool Limit Per User */}
-          {contractInfo?.hasUserLimit && (
-            <div className="pt-4 border-t border-red-9/10">
-              <div className="p-3 bg-zinc-900 border border-red-9/20 rounded-md">
-                <p className="text-zinc-400 text-sm font-monorama">
-                  Pool Limit Per User: {withCommas(contractInfo.poolLimitPerUserFormatted || '0')} {stakedSymbol}
-                </p>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

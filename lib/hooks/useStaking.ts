@@ -110,9 +110,6 @@ export interface ContractInfo {
   activeStakedFormatted?: string;
   rewardPerBlock: bigint;
   rewardPerBlockFormatted: string;
-  poolLimitPerUser: bigint;
-  poolLimitPerUserFormatted: string;
-  hasUserLimit: boolean;
   contractBalance: bigint;
   contractBalanceFormatted: string;
   rewardBalance: bigint;
@@ -160,8 +157,6 @@ export function useStaking() {
       let totalStaked = BigInt(0);
       let rewardPerBlock = BigInt(0);
       let totalInExitPeriod = BigInt(0);
-      let poolLimitPerUser = BigInt(0);
-      let hasUserLimit = false;
       let contractBalance = BigInt(0);
       let rewardBalance = BigInt(0);
 
@@ -176,13 +171,6 @@ export function useStaking() {
         rewardPerBlock = await stakingContract.rewardPerBlock();
       } catch (e) {
         console.warn('Failed to get rewardPerBlock:', e);
-      }
-
-      try {
-        poolLimitPerUser = await stakingContract.poolLimitPerUser();
-        hasUserLimit = await stakingContract.hasUserLimit();
-      } catch (e) {
-        console.warn('Failed to get pool limits:', e);
       }
 
       try {
@@ -229,9 +217,6 @@ export function useStaking() {
         activeStakedFormatted: formatBalance(formatQuai(activeStaked)),
         rewardPerBlock,
         rewardPerBlockFormatted: formatBalance(formatQuai(rewardPerBlock)),
-        poolLimitPerUser,
-        poolLimitPerUserFormatted: formatBalance(formatQuai(poolLimitPerUser)),
-        hasUserLimit,
         contractBalance,
         contractBalanceFormatted: formatBalance(formatQuai(contractBalance)),
         rewardBalance,
@@ -352,8 +337,6 @@ export function useStaking() {
       // Get contract info with error handling
       let totalStaked = BigInt(0);
       let rewardPerBlock = BigInt(0);
-      let poolLimitPerUser = BigInt(0);
-      let hasUserLimit = false;
       let contractBalance = BigInt(0);
       let rewardBalance = BigInt(0);
 
@@ -368,13 +351,6 @@ export function useStaking() {
         rewardPerBlock = await stakingContract.rewardPerBlock();
       } catch (e) {
         console.warn('Failed to get rewardPerBlock:', e);
-      }
-
-      try {
-        poolLimitPerUser = await stakingContract.poolLimitPerUser();
-        hasUserLimit = await stakingContract.hasUserLimit();
-      } catch (e) {
-        console.warn('Failed to get pool limits:', e);
       }
 
       try {
@@ -437,9 +413,6 @@ export function useStaking() {
         activeStakedFormatted: formatBalance(formatQuai(activeStaked)),
         rewardPerBlock,
         rewardPerBlockFormatted: formatBalance(formatQuai(rewardPerBlock)),
-        poolLimitPerUser,
-        poolLimitPerUserFormatted: formatBalance(formatQuai(poolLimitPerUser)),
-        hasUserLimit,
         contractBalance,
         contractBalanceFormatted: formatBalance(formatQuai(contractBalance)),
         rewardBalance,
@@ -482,14 +455,6 @@ export function useStaking() {
       // Check user balance
       if (contractInfo && depositAmount > contractInfo.userQuaiBalance) {
         throw new Error('Insufficient balance');
-      }
-
-      // Check pool limit if applicable
-      if (contractInfo?.hasUserLimit && userInfo) {
-        const newTotal = userInfo.stakedAmount + depositAmount;
-        if (newTotal > contractInfo.poolLimitPerUser) {
-          throw new Error(`Deposit would exceed pool limit of ${contractInfo.poolLimitPerUserFormatted} QUAI`);
-        }
       }
 
       // Send deposit transaction with value only (no duration in new contract)

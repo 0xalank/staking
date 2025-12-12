@@ -227,13 +227,6 @@ export default function StakePage() {
                   </div>
                 </div>
 
-                {staking.contractInfo.hasUserLimit && (
-                  <div className="p-3 bg-zinc-900 border border-red-9/20 rounded-md">
-                    <p className="text-zinc-400 text-sm font-monorama">
-                      Pool Limit Per User: {Number(staking.contractInfo.poolLimitPerUserFormatted || '0').toLocaleString('en-US', { maximumFractionDigits: 6 })} $QUAI
-                    </p>
-                  </div>
-                )}
               </div>
             </CardContent>
           )}

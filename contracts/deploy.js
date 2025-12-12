@@ -35,11 +35,9 @@ async function deploySmartChefNative() {
     const startBlock = currentBlock
 
     // Configuration
-    const poolLimitPerUser = quais.parseQuai('100000') // 100,000 QUAI max per user
     const rewardPerBlock = quais.parseQuai('0.01')
 
     console.log('Current block:', currentBlock)
-    console.log('Pool limit per user:', quais.formatQuai(poolLimitPerUser), 'QUAI')
     console.log('Reward per block:', quais.formatQuai(rewardPerBlock), 'QUAI')
     console.log('Start block:', startBlock)
 
@@ -52,11 +50,10 @@ async function deploySmartChefNative() {
     )
 
     // Constructor signature:
-    // constructor(uint256 _rewardPerBlock, uint256 _startBlock, uint256 _poolLimitPerUser)
+    // constructor(uint256 _rewardPerBlock, uint256 _startBlock)
     const smartChefNative = await SmartChefNativeFactory.deploy(
       rewardPerBlock,
-      startBlock,
-      poolLimitPerUser
+      startBlock
     )
 
     console.log('SmartChefNative deployment transaction:', smartChefNative.deploymentTransaction().hash)

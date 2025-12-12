@@ -16,16 +16,12 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
   // Withdrawal lock period (default 30 days after requesting withdrawal)
   uint256 public withdrawalLockPeriod = 30 days;
 
-  // Whether a limit is set for users
-  bool public hasUserLimit;
   // Accrued token per share
   uint256 public accTokenPerShare;
   // The block number when mining starts
   uint256 public startBlock;
   // The block number of the last pool update
   uint256 public lastRewardBlock;
-  // The pool limit (0 if none)
-  uint256 public poolLimitPerUser;
   // Tokens created per block
   uint256 public rewardPerBlock;
   // Precision factor for reward calculations
@@ -45,7 +41,6 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
   event WithdrawalCancelled(address indexed user, uint256 amount);
   event RewardClaimed(address indexed user, uint256 amount);
   event NewRewardPerBlock(uint256 rewardPerBlock);
-  event NewPoolLimit(uint256 poolLimitPerUser);
   event AdminTokenRecovery(address tokenRecovered, uint256 amount);
   event RewardsFunded(uint256 amount);
   event BlockTimeUpdated(uint256 oldBlockTime, uint256 newBlockTime);
@@ -58,28 +53,20 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     uint256 rewardBalance
   );
 
-  constructor(uint256 _rewardPerBlock, uint256 _startBlock, uint256 _poolLimitPerUser) Ownable(msg.sender) {
+  constructor(uint256 _rewardPerBlock, uint256 _startBlock) Ownable(msg.sender) {
     rewardPerBlock = _rewardPerBlock;
     startBlock = _startBlock > block.number ? _startBlock : block.number;
     lastRewardBlock = startBlock;
-    if (_poolLimitPerUser > 0) {
-      hasUserLimit = true;
-      poolLimitPerUser = _poolLimitPerUser;
-    }
     // Native token has 18 decimals
     PRECISION_FACTOR = 10 ** (30 - 18);
   }
 
-  // Deposit native tokens and collect rewards
+  // Deposit native tokens and collect pending rewards
   // User can deposit at any time, even if they have a pending withdrawal
   function deposit() external payable nonReentrant {
     UserInfo storage user = userInfo[msg.sender];
     uint256 _amount = msg.value;
     require(_amount > 0, 'Deposit amount must be greater than 0');
-
-    if (hasUserLimit) {
-      require(_amount + user.amount <= poolLimitPerUser, 'User amount above limit');
-    }
 
     _updatePool();
 
@@ -87,10 +74,7 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     if (user.amount > 0) {
       uint256 pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
       if (pending > 0) {
-        // Check solvency: ensure we don't use the new deposit (msg.value) to pay old rewards
-        // Available rewards = (balance before deposit) - totalStaked - totalPendingWithdrawals
         uint256 balanceBeforeDeposit = address(this).balance - msg.value;
-        require(balanceBeforeDeposit >= totalStaked + totalPendingWithdrawals, 'Contract invariant violated');
         uint256 rewardBalance = balanceBeforeDeposit - totalStaked - totalPendingWithdrawals;
         require(pending <= rewardBalance, 'Insufficient reward balance');
         _safeTransferNative(msg.sender, pending);
@@ -108,6 +92,7 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
   // Request withdrawal of staked tokens
   // This moves principal from active staking to pending withdrawal
   // Principal stops accruing rewards and starts a 30-day lock period
+  // Auto-claims pending rewards - use emergencyRequestWithdrawal if rewards are insolvent
   function requestWithdrawal(uint256 _amount) external nonReentrant {
     UserInfo storage user = userInfo[msg.sender];
     require(_amount > 0, 'Amount must be greater than 0');
@@ -116,7 +101,7 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
 
     _updatePool();
 
-    // Claim any pending rewards before moving principal
+    // Auto-claim any pending rewards before moving principal
     uint256 pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
     if (pending > 0) {
       uint256 rewardBalance = address(this).balance - totalStaked - totalPendingWithdrawals;
@@ -134,6 +119,30 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     user.withdrawalRequestTime = block.timestamp;
 
     // Update reward debt for remaining active stake
+    user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
+
+    emit WithdrawalRequested(msg.sender, _amount);
+  }
+
+  // Emergency request withdrawal - forfeits pending rewards but guarantees exit
+  // Use this if requestWithdrawal fails due to insufficient reward balance
+  function emergencyRequestWithdrawal(uint256 _amount) external nonReentrant {
+    UserInfo storage user = userInfo[msg.sender];
+    require(_amount > 0, 'Amount must be greater than 0');
+    require(user.amount >= _amount, 'Amount to withdraw too high');
+    require(user.pendingWithdrawal == 0, 'Already have pending withdrawal');
+
+    _updatePool();
+
+    // Move principal from active staking to pending withdrawal (no reward claim)
+    user.amount = user.amount - _amount;
+    totalStaked = totalStaked - _amount;
+
+    user.pendingWithdrawal = _amount;
+    totalPendingWithdrawals = totalPendingWithdrawals + _amount;
+    user.withdrawalRequestTime = block.timestamp;
+
+    // Reset reward debt - user forfeits pending rewards
     user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
 
     emit WithdrawalRequested(msg.sender, _amount);
@@ -159,6 +168,7 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
   }
 
   // Cancel a pending withdrawal and return funds to active staking
+  // Auto-claims pending rewards on remaining active stake
   function cancelWithdrawal() external nonReentrant {
     UserInfo storage user = userInfo[msg.sender];
     require(user.pendingWithdrawal > 0, 'No pending withdrawal');
@@ -167,8 +177,7 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
 
     _updatePool();
 
-    // First, calculate and pay any pending rewards on current active stake
-    // This prevents losing rewards earned during the withdrawal lock period
+    // Auto-claim any pending rewards on current active stake
     if (user.amount > 0) {
       uint256 pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
       if (pending > 0) {
@@ -184,16 +193,10 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     user.withdrawalRequestTime = 0;
     totalPendingWithdrawals = totalPendingWithdrawals - amountToCancel;
 
-    // Check pool limit if applicable
-    if (hasUserLimit) {
-      require(user.amount + amountToCancel <= poolLimitPerUser, 'User amount above limit');
-    }
-
     user.amount = user.amount + amountToCancel;
     totalStaked = totalStaked + amountToCancel;
 
     // Update reward debt for the new active stake amount
-    // User starts earning rewards from this point forward on the returned amount
     user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
 
     emit WithdrawalCancelled(msg.sender, amountToCancel);
@@ -228,11 +231,6 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     uint256 rewardBalance = address(this).balance - totalStaked - totalPendingWithdrawals;
     require(pending <= rewardBalance, 'Insufficient reward balance');
 
-    // Check pool limit if applicable
-    if (hasUserLimit) {
-      require(user.amount + pending <= poolLimitPerUser, 'User amount above limit');
-    }
-
     // Add rewards to staked amount (no transfer needed - rewards stay in contract)
     user.amount = user.amount + pending;
     totalStaked = totalStaked + pending;
@@ -264,20 +262,27 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     // Calculate blocks per year based on current block time
     uint256 blocksPerYear = (365 * 24 * 3600) / blockTime;
 
+    uint256 newRewardPerBlock;
     if (totalStaked > 0) {
       // rewardPerBlock = (totalStaked * APY) / (blocksPerYear * 10000)
-      rewardPerBlock = (totalStaked * _newAPYBasisPoints) / (blocksPerYear * 10000);
+      newRewardPerBlock = (totalStaked * _newAPYBasisPoints) / (blocksPerYear * 10000);
     } else {
       // If no tokens staked, set a default based on expected stake
       // This will auto-adjust when tokens are staked
-      rewardPerBlock = (_newAPYBasisPoints * 1e18) / (blocksPerYear * 10000);
+      newRewardPerBlock = (_newAPYBasisPoints * 1e18) / (blocksPerYear * 10000);
     }
+
+    // Cap at 500 QUAI per block to prevent abuse
+    require(newRewardPerBlock <= 500 ether, 'Calculated reward per block exceeds 500 QUAI');
+    rewardPerBlock = newRewardPerBlock;
 
     emit NewRewardPerBlock(rewardPerBlock);
   }
 
   // Alternative: Set reward per block directly (for precise control)
+  // Max 500 QUAI per block to prevent abuse if admin key is compromised
   function setRewardPerBlock(uint256 _rewardPerBlock) external onlyOwner {
+    require(_rewardPerBlock <= 500 ether, 'Reward per block cannot exceed 500 QUAI');
     _updatePool(); // Lock in past rewards before changing rate
     rewardPerBlock = _rewardPerBlock;
     emit NewRewardPerBlock(rewardPerBlock);
@@ -292,21 +297,12 @@ contract SmartChefNative is Ownable, ReentrancyGuard {
     emit BlockTimeUpdated(oldBlockTime, _newBlockTime);
   }
 
-  // Update withdrawal lock period
+  // Update withdrawal lock period (max 60 days to protect users)
   function updateWithdrawalLockPeriod(uint256 _newPeriod) external onlyOwner {
+    require(_newPeriod <= 60 days, 'Lock period cannot exceed 60 days');
     uint256 oldPeriod = withdrawalLockPeriod;
     withdrawalLockPeriod = _newPeriod;
     emit WithdrawalLockPeriodUpdated(oldPeriod, _newPeriod);
-  }
-
-  // Update pool limit per user
-  // NOTE: Limit can only be increased, never decreased or removed.
-  // This protects users with pending withdrawals from being trapped.
-  function updatePoolLimitPerUser(uint256 _newPoolLimitPerUser) external onlyOwner {
-    require(_newPoolLimitPerUser > poolLimitPerUser, 'New limit must be higher than current');
-    hasUserLimit = true;
-    poolLimitPerUser = _newPoolLimitPerUser;
-    emit NewPoolLimit(poolLimitPerUser);
   }
 
   // Fund rewards pool with native tokens
