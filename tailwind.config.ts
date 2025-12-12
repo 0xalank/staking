@@ -16,7 +16,7 @@ const config = {
     extend: {
       fontFamily: {
         satoshi: ['var(--font-satoshi)', ...fontFamily.sans],
-        monorama: ['var(--font-monorama)', ...fontFamily.sans],
+        monorama: ['var(--font-techno)', ...fontFamily.sans],
       },
       fontSize: {
         'display-2xl': [

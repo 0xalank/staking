@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { cn } from '@/lib/utils';
 import { Analytics } from '@vercel/analytics/react';
 import localFont from 'next/font/local';
+import { Chakra_Petch } from 'next/font/google';
 import Providers from '@/lib/context/providers';
 import { Toaster } from '@/components/ui/toaster';
 import { Inter } from 'next/font/google';
@@ -23,12 +24,10 @@ const satoshiFont = localFont({
   variable: '--font-satoshi',
 });
 
-const monoramaFont = localFont({
-  src: [
-    { path: '../fonts/Monorama-Regular.woff2', weight: '400' },
-    { path: '../fonts/Monorama-Regular.woff2', weight: '700' },
-  ],
-  variable: '--font-monorama',
+const chakraPetchFont = Chakra_Petch({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-techno',
 });
 
 const inter = Inter({ subsets: ['latin'] });
@@ -72,7 +71,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          `bg-[#0C0C0C] text-white antialiased ${satoshiFont.variable} ${monoramaFont.variable} ${inter.className}`
+          `bg-[#0C0C0C] text-white antialiased ${satoshiFont.variable} ${chakraPetchFont.variable} ${inter.className}`
         )}
       >
         <StateProvider>
