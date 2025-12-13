@@ -14,6 +14,8 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X, ChevronDown, LogOut, ExternalLink, Copy, Check } from 'lucide-react';
 
+const isTestnet = process.env.NEXT_PUBLIC_TESTNET === 'true';
+
 export default function Header() {
   const { account, web3Provider } = useContext(StateContext);
   const dispatch = useContext(DispatchContext);
@@ -125,7 +127,14 @@ export default function Header() {
             <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
               
               {/* Wallet Button */}
-              {web3Provider === undefined ? (
+              {isTestnet ? (
+                <Button
+                  disabled
+                  className="bg-zinc-800 text-zinc-500 border border-zinc-700 font-monorama uppercase tracking-wider cursor-not-allowed px-3 md:px-4 text-xs md:text-sm"
+                >
+                  Coming Soon
+                </Button>
+              ) : web3Provider === undefined ? (
                 <a href="https://chromewebstore.google.com/detail/pelagus/nhccebmfjcbhghphpclcfdkkekheegop" target="_blank">
                   <Button
                     className="bg-pelagusBlue/10 text-pelagusBlue border border-pelagusBlue/50 hover:bg-pelagusBlue hover:text-white font-monorama uppercase tracking-wider transition-all duration-300 shadow-[0_0_10px_rgba(23,117,228,0.1)] hover:shadow-[0_0_20px_rgba(23,117,228,0.4)] px-3 md:px-4 text-xs md:text-sm"
