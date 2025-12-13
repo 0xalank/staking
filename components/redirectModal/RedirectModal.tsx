@@ -41,7 +41,7 @@ export const RedirectModal = () => {
             <p className="text-xs text-zinc-400 leading-relaxed mb-3">
               The yield comes from protocol revenue. Track subsidy rewards from merge-mining on the SOAP dashboard.
             </p>
-            <Link href="https://soap-dashboard-eight.vercel.app/" target="_blank">
+            <Link href="https://soap.qu.ai/" target="_blank">
               <Button
                 size="sm"
                 className="h-8 bg-red-9 hover:bg-red-8 text-white text-xs font-bold uppercase tracking-wide w-full flex items-center gap-2"

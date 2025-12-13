@@ -73,7 +73,7 @@ export default function Header() {
     { label: 'SOAP Calculator', href: '/calculator' },
     { label: 'How to Stake', href: '/how-to-stake' },
     { label: 'What is SOAP?', href: '/what-is-soap' },
-    { label: 'Subsidy Tracker', href: 'https://soap-dashboard-eight.vercel.app/', external: true },
+    { label: 'Subsidy Tracker', href: 'https://soap.qu.ai/', external: true },
   ];
 
   return (
