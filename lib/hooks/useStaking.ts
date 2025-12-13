@@ -6,6 +6,8 @@ import SmartChefNativeArtifact from '@/lib/SmartChefNative.json';
 const SmartChefNativeABI = (SmartChefNativeArtifact as any).abi;
 import { RPC_URL, STAKING_CONTRACT_ADDRESS, SECONDS_PER_BLOCK, WITHDRAWAL_LOCK_PERIOD } from '@/lib/config';
 
+const isTestnet = process.env.NEXT_PUBLIC_TESTNET === 'true';
+
 // Re-export formatQuai for use in other components
 export { formatQuai, parseQuai };
 
@@ -432,6 +434,11 @@ export function useStaking() {
 
   // Deposit tokens (no duration parameter - simple staking)
   const deposit = useCallback(async (amount: string, _durationSeconds?: number) => {
+    if (isTestnet) {
+      setError('Staking is not available yet. Coming soon!');
+      return;
+    }
+
     if (!account?.addr || !web3Provider) {
       setError('Please connect your wallet');
       return;
@@ -479,6 +486,11 @@ export function useStaking() {
 
   // Request withdrawal (starts 30-day lock period)
   const requestWithdraw = useCallback(async (amount: string) => {
+    if (isTestnet) {
+      setError('Withdrawals are not available yet. Coming soon!');
+      return;
+    }
+
     if (!account?.addr || !web3Provider) {
       setError('Please connect your wallet');
       return;
@@ -544,6 +556,11 @@ export function useStaking() {
 
   // Execute withdrawal (after 30-day lock period)
   const executeWithdraw = useCallback(async () => {
+    if (isTestnet) {
+      setError('Withdrawals are not available yet. Coming soon!');
+      return;
+    }
+
     if (!account?.addr || !web3Provider) {
       setError('Please connect your wallet');
       return;
@@ -586,6 +603,11 @@ export function useStaking() {
 
   // Cancel withdrawal request and return funds to active staking
   const cancelWithdraw = useCallback(async () => {
+    if (isTestnet) {
+      setError('Withdrawals are not available yet. Coming soon!');
+      return;
+    }
+
     if (!account?.addr || !web3Provider) {
       setError('Please connect your wallet');
       return;
@@ -628,6 +650,11 @@ export function useStaking() {
 
   // Claim rewards (now claims claimable delayed rewards)
   const claimRewards = useCallback(async () => {
+    if (isTestnet) {
+      setError('Claiming rewards is not available yet. Coming soon!');
+      return;
+    }
+
     if (!account?.addr || !web3Provider) {
       setError('Please connect your wallet');
       return;
@@ -723,6 +750,11 @@ export function useStaking() {
 
   // Compound rewards (claim + restake in one transaction)
   const compound = useCallback(async () => {
+    if (isTestnet) {
+      setError('Compounding is not available yet. Coming soon!');
+      return;
+    }
+
     if (!account?.addr || !web3Provider) {
       setError('Please connect your wallet');
       return;
@@ -787,6 +819,11 @@ export function useStaking() {
 
   // Load staking info on mount and when wallet connection changes
   useEffect(() => {
+    // Don't load data in testnet mode
+    if (isTestnet) {
+      return;
+    }
+
     // Always load staking info (will load contract info if no wallet, or full info if wallet connected)
     loadStakingInfo();
     // No polling - only refresh after transactions

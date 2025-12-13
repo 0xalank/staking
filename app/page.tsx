@@ -33,12 +33,14 @@ const quaiStakingPool = {
   token: 'QUAI',
 };
 
+const isTestnet = process.env.NEXT_PUBLIC_TESTNET === 'true';
+
 const PoolCard = ({ stakingData, isLoading }: {
   stakingData?: any,
   isLoading?: boolean
 }) => {
   const { account } = useContext(StateContext);
-  
+
   // Format helpers
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -74,7 +76,11 @@ const PoolCard = ({ stakingData, isLoading }: {
           </div>
           <div className="text-right">
              <div className="text-xs text-red-9/80 font-mono uppercase mb-1">APY Rate</div>
-             {isLoading ? (
+             {isTestnet ? (
+               <div className="text-xl font-bold font-monorama bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                 TBD
+               </div>
+             ) : isLoading ? (
                <div className="h-6 w-16 bg-red-9/10 animate-pulse rounded" />
              ) : (
                <div className="text-xl font-bold font-monorama bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
@@ -94,9 +100,9 @@ const PoolCard = ({ stakingData, isLoading }: {
                     <Activity className="w-3 h-3" /> Total Staked
                 </div>
                 <div className="text-lg font-semibold text-white">
-                     {stakingData?.contractInfo ? (
-                        Number(stakingData.contractInfo.activeStakedFormatted || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })
-                     ) : "-"} QUAI
+                     {isTestnet ? "TBD" : stakingData?.contractInfo ? (
+                        Number(stakingData.contractInfo.activeStakedFormatted || 0).toLocaleString(undefined, { maximumFractionDigits: 0 }) + " QUAI"
+                     ) : "- QUAI"}
                 </div>
             </div>
              <div className="bg-zinc-900/50 border border-zinc-800 p-3 rounded hover:border-red-9/30 transition-colors">
@@ -136,17 +142,41 @@ const PoolCard = ({ stakingData, isLoading }: {
 
         {/* Action Button */}
         <div className="pt-2">
-           <Link href={`/stake/${quaiStakingPool.id}${hasStake ? '?mode=manage' : ''}`} className="block group/btn">
+           {hasStake ? (
+             <Link href={`/stake/${quaiStakingPool.id}?mode=manage`} className="block group/btn">
+                <Button
+                  className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
+                  style={{
+                      clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                  }}
+                >
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
+                  Manage Stake
+                </Button>
+              </Link>
+           ) : isTestnet ? (
               <Button
-                className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
+                className="w-full h-14 bg-zinc-800 text-zinc-400 font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button cursor-not-allowed"
                 style={{
                     clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
                 }}
+                disabled
               >
-                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
-                {hasStake ? 'Manage Stake' : 'Initialize Stake'}
+                Coming Soon
               </Button>
-            </Link>
+           ) : (
+             <Link href={`/stake/${quaiStakingPool.id}`} className="block group/btn">
+                <Button
+                  className="w-full h-14 bg-red-9 hover:bg-red-8 text-white font-bold tracking-widest uppercase rounded-none relative overflow-hidden transition-all clip-button"
+                  style={{
+                      clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)'
+                  }}
+                >
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-[100%] group-hover/btn:animate-[shine_1s_infinite]" />
+                  Initialize Stake
+                </Button>
+              </Link>
+           )}
         </div>
 
 
@@ -158,6 +188,10 @@ const PoolCard = ({ stakingData, isLoading }: {
 
 export default function Home() {
   const staking = useStaking();
+
+  // When testnet, don't show live data
+  const stakingData = isTestnet ? null : staking;
+  const stakingLoading = isTestnet ? false : staking.isLoading;
 
   return (
     <main className="relative min-h-[100dvh] flex flex-col items-center pt-24 md:pt-28 p-4 overflow-hidden selection:bg-red-9/30">
@@ -173,12 +207,24 @@ export default function Home() {
 
         {/* Hero Section */}
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-9/50 bg-red-9/20 backdrop-blur-md mb-2 animate-fade-in-down">
+          <div className={cn(
+            "inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md mb-2 animate-fade-in-down",
+            isTestnet ? "border border-zinc-600 bg-zinc-800/50" : "border border-red-9/50 bg-red-9/20"
+          )}>
             <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-9 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-9"></span>
+              <span className={cn(
+                "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+                isTestnet ? "bg-zinc-500" : "bg-red-9"
+              )}></span>
+              <span className={cn(
+                "relative inline-flex rounded-full h-3 w-3",
+                isTestnet ? "bg-zinc-500" : "bg-red-9"
+              )}></span>
             </span>
-            <span className="text-sm font-monorama text-red-9 font-bold tracking-widest uppercase">Now Live</span>
+            <span className={cn(
+              "text-sm font-monorama font-bold tracking-widest uppercase",
+              isTestnet ? "text-zinc-400" : "text-red-9"
+            )}>{isTestnet ? 'Coming Soon' : 'Now Live'}</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-monorama font-bold text-white tracking-tight uppercase leading-none animate-in fade-in-up duration-700 delay-100">
@@ -195,8 +241,8 @@ export default function Home() {
         <div className="w-full max-w-md">
           <div className="transform transition-transform duration-500 hover:-translate-y-2">
              <PoolCard
-              stakingData={staking}
-              isLoading={staking.isLoading}
+              stakingData={stakingData}
+              isLoading={stakingLoading}
             />
           </div>
         </div>

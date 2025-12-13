@@ -1,16 +1,18 @@
 'use client';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { StateContext } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useStaking } from '@/lib/hooks/useStaking';
 import { StakingInfo } from '@/components/ui/staking-info';
 import { GridTraffic } from '@/components/ui/grid-traffic';
 import { cn } from '@/lib/utils';
+
+const isTestnet = process.env.NEXT_PUBLIC_TESTNET === 'true';
 
 // Token Logo Component
 const TokenLogo = ({ size = 24 }: { size?: number }) => {
@@ -37,6 +39,7 @@ const poolData = {
 
 export default function StakePage() {
   const params = useParams();
+  const router = useRouter();
   const { account } = useContext(StateContext);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -44,6 +47,28 @@ export default function StakePage() {
   const staking = useStaking();
 
   const poolId = params.id as string;
+
+  // Redirect to home if testnet mode is enabled
+  useEffect(() => {
+    if (isTestnet) {
+      router.replace('/');
+    }
+  }, [router]);
+
+  // Show nothing while redirecting in testnet mode
+  if (isTestnet) {
+    return (
+      <main className="relative min-h-[100dvh] flex flex-col items-center justify-center p-4 overflow-hidden selection:bg-red-9/30">
+        <div className="fixed inset-0 bg-[#050505] -z-20" />
+        <GridTraffic />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-9/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
+        <div className="text-center relative z-10">
+          <Loader2 className="animate-spin h-8 w-8 text-red-9 mx-auto mb-4" />
+          <p className="text-zinc-400 font-monorama">Redirecting...</p>
+        </div>
+      </main>
+    );
+  }
 
   // Only support native-quai pool
   if (poolId !== 'native-quai') {
